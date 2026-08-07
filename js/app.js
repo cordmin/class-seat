@@ -1454,8 +1454,8 @@ function showHelp() { document.getElementById('help-modal').style.display = 'fle
       
       const isTeacherMode = document.getElementById('board-area').classList.contains('teacher-mode');
       
-      const fixedW = 80; 
-      const fixedH = isTeacherMode ? 180 : 130; 
+      const fixedW = 60; 
+      const fixedH = isTeacherMode ? 180 : 120; 
       
       let scalableAvailW = workspace.clientWidth - fixedW;
       let scalableAvailH = workspace.clientHeight - fixedH;
@@ -1467,23 +1467,25 @@ function showHelp() { document.getElementById('help-modal').style.display = 'fle
       
       const scaleX = scalableAvailW / baseTotalW;
       const scaleY = scalableAvailH / baseTotalH;
+      
+      // Always match the smaller scale so it NEVER overflows vertically or horizontally
       let scale = Math.min(scaleX, scaleY);
       
       if (scale > 1.8) scale = 1.8;
-      if (scale < 0.65) scale = 0.65;
+      if (scale < 0.25) scale = 0.25;
       
       const cellW = baseCellW * scale;
       const cellH = baseCellH * scale;
-      const colGap = Math.max(10, baseColGap * scale);
-      const rowGap = Math.max(6, baseRowGap * scale);
+      const colGap = Math.max(6, baseColGap * scale);
+      const rowGap = Math.max(4, baseRowGap * scale);
       
       document.documentElement.style.setProperty('--cell-w', cellW + 'px');
       document.documentElement.style.setProperty('--cell-h', cellH + 'px');
       document.documentElement.style.setProperty('--col-gap', colGap + 'px');
       document.documentElement.style.setProperty('--row-gap', rowGap + 'px');
       
-      document.documentElement.style.setProperty('--name-size', Math.max(11, 15 * scale) + 'px');
-      document.documentElement.style.setProperty('--id-size', Math.max(9, 11 * scale) + 'px');
+      document.documentElement.style.setProperty('--name-size', Math.max(10, 15 * scale) + 'px');
+      document.documentElement.style.setProperty('--id-size', Math.max(8, 11 * scale) + 'px');
       
       const container = document.getElementById('seats-container');
       if (container) container.style.gap = colGap + 'px';
