@@ -726,14 +726,7 @@
   <div class="sb-body" id="sb-body">
 
 
-      <div class="card">
-        <div class="card-head">👥 등록된 학생 목록</div>
-        <div class="card-body">
-          <div id="student-list-preview" style="max-height:220px;overflow-y:auto;font-size:11px;color:var(--textw);line-height:1.8;">
-            <span style="color:var(--textm);">등록된 학생이 없습니다.</span>
-          </div>
-        </div>
-      </div>
+
     </div>
     
     
@@ -1695,6 +1688,7 @@ function applyStudents() {
 
 function updateStudentListPreview() {
   const el = document.getElementById('student-list-preview');
+  if (!el) return;
   if (students.length === 0) { el.innerHTML = '<span style="color:var(--textm);">등록된 학생이 없습니다.</span>'; return; }
   el.innerHTML = students.map(s =>
     `<div style="display:flex;gap:8px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.05);">
