@@ -20,58 +20,74 @@
         <span id="btn-view-students" style="display:none; background:var(--accent); color:#fff; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:800; cursor:pointer; white-space:nowrap;" onclick="openStudentModal()"><span id="count-num">0</span>명</span>
       </div>
       <div class="card-body" style="display:flex; gap:6px;">
-        <button class="exec-btn-sm" style="flex:1; background:#fff; color:var(--text1); border:1px solid var(--border2); box-shadow:none; font-weight:700; font-size:11px; padding:8px 4px; margin-bottom:0;" onclick="downloadTemplate()">명렬표 내려받기</button>
-        <button class="exec-btn-sm" style="flex:1; background:var(--accent); color:#fff; border:none; box-shadow:none; font-weight:700; font-size:11px; padding:8px 4px; margin-bottom:0;" onclick="loadStudentExcel()">명렬표 불러오기</button>
+        <button class="exec-btn-sm outline" style="flex:1;" onclick="downloadTemplate()">명렬표 내려받기</button>
+        <button class="exec-btn-sm outline" style="flex:1;" onclick="loadStudentExcel()">명렬표 불러오기</button>
       </div>
     </div>
 
     <!-- 책상 배열 카드 -->
     <div class="card">
-      <div class="card-head">책상 배열
-        <span class="badge" id="avail-badge">0석</span>
-      </div>
+      <div class="card-head">책상 배열</div>
       <div class="card-body">
-        <select class="inp mb8" id="layout-type" onchange="onLayoutChange()">
-          <option value="single">1인자리(개별)</option>
-          <option value="pair">2인자리(짝꿍)</option>
-          <option value="group">4인모둠(2x2)</option>
-          <option value="group6">6인모둠(2x3)</option>
-        </select>
-
         <div class="grid2 mb6">
           <div>
             <label class="lbl">책상 총수</label>
             <input class="inp inp-num" type="number" id="seat-count" min="1" max="60" value="30" onchange="onSeatCountChange()">
           </div>
           <div>
-            <label class="lbl">분단(or 라인) 수</label>
-            <input class="inp inp-num" type="number" id="col-count" min="1" max="10" value="5" onchange="onColCountChange()">
+            <label class="lbl">분단 수</label>
+            <select class="inp inp-num" id="col-count" onchange="onColCountChange()">
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5" selected>5</option>
+              <option value="6">6</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid2 mb6">
+          <div>
+            <label class="lbl">배열 방법</label>
+            <select class="inp" id="layout-type" onchange="onLayoutChange()">
+              <option value="single">혼자앉기</option>
+              <option value="pair">짝궁배열</option>
+              <option value="group">4인모둠(2x2)</option>
+              <option value="group6">6인모둠(2x3)</option>
+            </select>
+          </div>
+          <div>
+            <label class="lbl">배치 기준</label>
+            <select class="inp" id="sort-algo" onchange="onAlgoChange()"></select>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 배치 기준 카드 -->
+    <!-- 자리 배치 및 실행 카드 -->
     <div class="card">
-      <div class="card-head">배치 기준</div>
-      <div class="card-body">
-        <select class="inp mb6" id="sort-algo" onchange="onAlgoChange()"></select>
+      <div class="card-head">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <label class="switch">
+            <input type="checkbox" id="countdown-opt">
+            <span class="slider"></span>
+          </label>
+          <span class="toggle-label">카운트 다운</span>
+          <label class="switch">
+            <input type="checkbox" id="teacher-view-toggle" onchange="toggleTeacherView()">
+            <span class="slider"></span>
+          </label>
+          <span class="toggle-label">교사 시점</span>
+        </div>
+      </div>
+      <div class="card-body" style="display:flex; flex-direction:column; gap:8px;">
+        <button class="exec-btn" style="width:100%; justify-content:center; padding:12px; font-size:15px;" onclick="executeArrangement()">자리 배치 실행</button>
       </div>
     </div>
 
-    <!-- 자리 배치 및 실행 카드 -->
     <div class="card">
-      <div class="card-head">자리 배치 및 실행</div>
-      <div class="card-body" style="display:flex; flex-direction:column; gap:8px;">
-        <button class="exec-btn" style="width:100%; justify-content:center; padding:12px; font-size:15px;" onclick="executeArrangement()">자리 배치 실행</button>
-        
-        <div style="display:flex; align-items:center; justify-content:center; padding:4px 0;">
-          <input type="checkbox" id="countdown-opt" style="cursor:pointer; width:15px; height:15px; accent-color:var(--accent);">
-          <label for="countdown-opt" style="cursor:pointer; color:var(--text1); font-size:12px; font-weight:700; margin-left:6px;">5초 카운트다운</label>
-        </div>
-
+      <div class="card-body">
         <div style="display:flex; gap:5px; margin-top:4px;">
-          <button class="exec-btn-sm" id="teacher-view-btn" style="flex:1; background:#fff; color:var(--text1); border:1px solid var(--border2); justify-content:center; padding:6px 2px; font-size:11px;" onclick="toggleTeacherView()">교사 시점</button>
           <button class="exec-btn-sm" style="flex:1; background:#fff; color:var(--text1); border:1px solid var(--border2); justify-content:center; padding:6px 2px; font-size:11px;" onclick="printScreen()">출력</button>
           <button class="exec-btn-sm" id="btn-save-pop" style="flex:1; background:var(--sidebar2); color:var(--text1); border:1px solid var(--border2); justify-content:center; position:relative; padding:6px 2px; font-size:11px;" onclick="toggleSaveMenu(event)">저장</button>
         </div>

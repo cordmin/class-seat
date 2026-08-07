@@ -862,27 +862,28 @@ function onLayoutChange() {
   cfg.layoutType = newLayout;
   
   if (isChanged) {
+    const colGapInput = document.getElementById('col-gap-range');
     if (cfg.layoutType === 'pair') {
       cfg.seatCount = 30;
       cfg.colCount = 3;
-      cfg.colGap = 48; 
+      cfg.colGap = 48;
       document.getElementById('seat-count').value = 30;
       document.getElementById('col-count').value = 3;
-      document.getElementById('col-gap-range').value = 48;
+      if (colGapInput) colGapInput.value = 48;
     } else if (cfg.layoutType === 'single') {
       cfg.seatCount = 30;
       cfg.colCount = 5;
-      cfg.colGap = 48; 
+      cfg.colGap = 48;
       document.getElementById('seat-count').value = 30;
       document.getElementById('col-count').value = 5;
-      document.getElementById('col-gap-range').value = 48;
+      if (colGapInput) colGapInput.value = 48;
     } else if (cfg.layoutType === 'group' || cfg.layoutType === 'group6') {
       cfg.seatCount = 30;
       cfg.colCount = 3;
-      cfg.colGap = 12; 
+      cfg.colGap = 12;
       document.getElementById('seat-count').value = 30;
       document.getElementById('col-count').value = 3;
-      document.getElementById('col-gap-range').value = 12;
+      if (colGapInput) colGapInput.value = 12;
     }
     document.documentElement.style.setProperty('--col-gap', cfg.colGap + 'px');
   }
@@ -922,7 +923,10 @@ function onFontChange() {
 }
 
 function updateBadge() {
-  document.getElementById('avail-badge').textContent = seats.filter(s => !s.isGhost && !s.excluded).length + '석';
+  const badge = document.getElementById('avail-badge');
+  if (badge) {
+    badge.textContent = seats.filter(s => !s.isGhost && !s.excluded).length + '석';
+  }
 }
 
 let toastTimer;
@@ -1335,29 +1339,25 @@ function printScreen() {
 
 
 function toggleTeacherView() {
-  teacherView = !teacherView;
-  const btn = document.getElementById('teacher-view-btn');
+  const checkbox = document.getElementById('teacher-view-toggle');
+  if (checkbox) {
+    teacherView = checkbox.checked;
+  } else {
+    teacherView = !teacherView;
+  }
   const blackboard = document.getElementById('blackboard-el');
   const boardArea = document.getElementById('board-area');
 
   if (teacherView) {
-    btn.style.background = '#dbeafe';
-    btn.style.color = '#1d4ed8';
-    btn.style.borderColor = '#93c5fd';
-    btn.title = '학생 시점으로 되돌리기';
-    btn.innerHTML = '학생 시점';
+    if (checkbox) checkbox.checked = true;
     blackboard.innerHTML = '칠판 <span style="font-size:11px;color:#a7f3c4;font-weight:400;">— 교사 시점</span>';
     boardArea.classList.add('teacher-mode');
   } else {
-    btn.style.background = '';
-    btn.style.color = '';
-    btn.style.borderColor = '';
-    btn.title = '교사 시점으로 화면 전환';
-    btn.innerHTML = '교사 시점';
+    if (checkbox) checkbox.checked = false;
     blackboard.textContent = '칠판';
     boardArea.classList.remove('teacher-mode');
   }
-  renderSeats(); 
+  renderSeats();
 }
 
 

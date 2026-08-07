@@ -113,10 +113,55 @@
   .sb-btn.danger { background: rgba(239,68,68,.12); color: var(--danger-text); border-color: rgba(239,68,68,.3); }
   .sb-btn.danger:hover { background: rgba(239,68,68,.25); }
 
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 22px;
+  }
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .switch .slider {
+    position: absolute;
+    inset: 0;
+    background: #e2d7cb;
+    border: 1px solid var(--border2);
+    border-radius: 999px;
+    transition: background .2s, border-color .2s;
+  }
+  .switch .slider::before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    bottom: 1px;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform .2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,.15);
+  }
+  .switch input:checked + .slider {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .switch input:checked + .slider::before {
+    transform: translateX(18px);
+  }
+
+  .toggle-label {
+    color: var(--text1);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
   .sb-body {
     flex: 1;
     overflow: hidden;
-    padding: 10px 12px 16px;
+    padding: 50px 12px 16px;
   }
 
   /* Cards */
@@ -131,7 +176,7 @@
   .card-head {
     display: flex; align-items: center; gap: 7px;
     padding: 9px 11px;
-    font-size: 11px; font-weight: 800;
+    font-size: 14px; font-weight: 800;
     color: var(--textw);
     border-bottom: 1px solid var(--border2);
   }
@@ -219,6 +264,17 @@
   }
   .exec-btn-sm:hover { opacity: .9; transform: translateY(-1px); }
   .exec-btn-sm:active { transform: translateY(0); }
+
+  .exec-btn-sm.outline {
+    background: #fff;
+    color: var(--text1);
+    border: 1px solid var(--border2);
+    box-shadow: none;
+    font-weight: 700;
+    font-size: 11px;
+    padding: 8px 4px;
+    margin-bottom: 0;
+  }
 
   .slider-row { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
   .slider-label { font-size: 10px; color: var(--textm); white-space: nowrap; min-width: 56px; }
