@@ -53,28 +53,28 @@ function playBeep(freq, duration, vol) {
 // ─── 동적 드롭다운 매핑 데이터 및 로직 ───────────────────────────
 const ALGO_OPTIONS = {
   single: [
-    { val: 'idAsc', text: '번호 순서 배치' },
-    { val: 'random', text: '무작위 배치' },
+    { val: 'idAsc', text: '번호 순서' },
+    { val: 'random', text: '무작위' },
     { val: 'genderSeparate', text: '남녀 최대 분리' }
   ],
   pair: [
-    { val: 'idAsc', text: '번호 순서 배치' },
-    { val: 'random', text: '무작위 배치' },
+    { val: 'idAsc', text: '번호 순서' },
+    { val: 'random', text: '무작위' },
     { val: 'genderPair', text: '남녀 짝궁' },
     { val: 'genderMixCluster', text: '동성 짝궁(분단교차)' },
     { val: 'genderMixRow', text: '동성 짝궁(줄별교차)' },
     { val: 'genderSeparate', text: '동성짝궁(남녀최대분리)' } 
   ],
   group: [
-    { val: 'idAsc', text: '번호 순서 배치' },
-    { val: 'random', text: '무작위 배치' },
+    { val: 'idAsc', text: '번호 순서' },
+    { val: 'random', text: '무작위' },
     { val: 'genderSeparate', text: '남녀 최대 분리' },
     { val: 'genderPair', text: '남녀 짝궁' },
     { val: 'genderSameGroup', text: '동성 짝궁' }
   ],
   group6: [
-    { val: 'idAsc', text: '번호 순서 배치' },
-    { val: 'random', text: '무작위 배치' },
+    { val: 'idAsc', text: '번호 순서' },
+    { val: 'random', text: '무작위' },
     { val: 'genderSeparate', text: '남녀 최대 분리' },
     { val: 'genderPair', text: '남녀 짝궁' },
     { val: 'genderSameGroup', text: '동성 짝궁' }
