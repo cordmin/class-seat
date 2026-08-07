@@ -159,10 +159,10 @@
 
   .inp {
     width: 100%;
-    background: var(--sidebar);
+    background: #ffffff;
     border: 1px solid var(--border2);
     border-radius: 6px;
-    color: var(--textw);
+    color: var(--text1);
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 12px;
     padding: 7px 9px;
@@ -170,7 +170,7 @@
     margin-bottom: 0;
   }
   .inp:focus { border-color: var(--accent); }
-  .inp option { background: var(--sidebar); }
+  .inp option { background: #ffffff; }
 
   .inp-num {
     text-align: center;
