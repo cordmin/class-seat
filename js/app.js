@@ -1493,10 +1493,16 @@ function showHelp() { document.getElementById('help-modal').style.display = 'fle
     } catch(e) {}
   }
 
-  setInterval(() => {
-    document.body.style.borderTop = document.body.style.borderTop === '0.1px solid transparent' ? '0px solid transparent' : '0.1px solid transparent';
-    fitToWorkspace();
-  }, 100);
+  // ─── 렌더링 안정화: 끊임없는 100ms 폴링 및 Border 토글 제거 (꿈틀거림 완벽 방지) ───
+  window.addEventListener('resize', fitToWorkspace);
+
+  if (window.ResizeObserver) {
+    const ro = new ResizeObserver(() => {
+      fitToWorkspace();
+    });
+    const ws = document.getElementById('workspace');
+    if (ws) ro.observe(ws);
+  }
 
 
 (function() {
@@ -1512,6 +1518,7 @@ function showHelp() { document.getElementById('help-modal').style.display = 'fle
     const w = Math.max(220, Math.min(400, startW + e.clientX - startX));
     const sb = document.getElementById('sidebar');
     sb.style.width = w + 'px'; sb.style.minWidth = w + 'px'; sb.style.maxWidth = w + 'px';
+    fitToWorkspace();
   });
   document.addEventListener('mouseup', () => { dragging = false; document.body.style.cursor = ''; });
 })();
