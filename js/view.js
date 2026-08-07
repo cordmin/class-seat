@@ -1,4 +1,4 @@
-import { state, cfg, LAYOUTS } from './state.js';
+import { state, cfg, LAYOUTS, saveAutoState } from './state.js';
 import { getLayoutRows, applyAlgo } from './layout.js';
 import { toast } from './ui.js';
 
@@ -199,6 +199,7 @@ function onSeatClick(id, e) {
     }
   }
   renderSeats();
+  saveAutoState();
 }
 
 function onSeatRightClick(id, e) {
@@ -260,6 +261,7 @@ function onDrop(id, e) {
 
   renderSeats();
   updateBadge();
+  saveAutoState();
 }
 
 function openContextMenu(x, y, seat) {

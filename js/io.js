@@ -357,16 +357,48 @@ export async function printScreen() {
   listDiv.innerHTML = tableHtml;
 
   // 2. 우측 분단 배치 영역
+  const isTeacher = state.teacherView;
   const rightWrap = document.createElement('div');
-  rightWrap.style.cssText = 'flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; box-sizing:border-box; overflow:hidden;';
+  rightWrap.style.cssText = 'flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; box-sizing:border-box; overflow:hidden; gap:12px;';
+
+  const bbEl = document.createElement('div');
+  bbEl.style.cssText = 'width:70%; max-width:380px; padding:12px 5px; background:#2e4a38; color:#ffffff; font-weight:900; text-align:center; border-radius:6px; font-size:14px; letter-spacing:4px; -webkit-print-color-adjust:exact; print-color-adjust:exact;';
+  bbEl.textContent = isTeacher ? '칠 판 (교사 시점)' : '칠 판';
 
   printWrap.appendChild(listDiv);
-  rightWrap.appendChild(seatsWrap);
+  
+  const originalSeatsWrapOrder = seatsWrap.style.order;
+
+  if (isTeacher) {
+    seatsWrap.style.order = '1';
+    bbEl.style.order = '2';
+    rightWrap.appendChild(seatsWrap);
+    rightWrap.appendChild(bbEl);
+  } else {
+    bbEl.style.order = '1';
+    seatsWrap.style.order = '2';
+    rightWrap.appendChild(bbEl);
+    rightWrap.appendChild(seatsWrap);
+  }
+  
   printWrap.appendChild(rightWrap);
   document.body.appendChild(printWrap);
 
+  // A4 가로 1페이지 초과 방지 자동 스케일링
+  const targetW = 990;
+  const targetH = 650;
+  const w = printWrap.scrollWidth || 1020;
+  const h = printWrap.scrollHeight || 700;
+  const scale = Math.min(targetW / w, targetH / h, 1);
+  if (scale < 1) {
+    printWrap.style.transform = `scale(${scale})`;
+    printWrap.style.transformOrigin = 'top left';
+    printWrap.style.width = `${w}px`;
+  }
+
   setTimeout(() => {
     window.print();
+    seatsWrap.style.order = originalSeatsWrapOrder;
     if (originalNextSibling) {
       originalParent.insertBefore(seatsWrap, originalNextSibling);
     } else {

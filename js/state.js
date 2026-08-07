@@ -87,3 +87,51 @@ export function getArrangementDataForSave() {
     }))
   }, null, 2);
 }
+
+export function saveAutoState() {
+  try {
+    const dataStr = getArrangementDataForSave();
+    localStorage.setItem('auto_saved_seat_arrangement', dataStr);
+    localStorage.setItem('auto_saved_teacher_view', JSON.stringify(state.teacherView));
+  } catch (err) {
+    console.error('Failed to auto-save state to localStorage:', err);
+  }
+}
+
+export function loadAutoState() {
+  try {
+    const dataStr = localStorage.getItem('auto_saved_seat_arrangement');
+    const teacherViewStr = localStorage.getItem('auto_saved_teacher_view');
+    if (!dataStr) return false;
+    const d = JSON.parse(dataStr);
+    if (!d || !d.students || !d.seats) return false;
+
+    state.students = d.students || [];
+    if (d.cfg) {
+      Object.assign(cfg, d.cfg);
+    }
+    if (teacherViewStr !== null) {
+      state.teacherView = JSON.parse(teacherViewStr);
+    }
+
+    state.seats = d.seats.map(s => {
+      const studentObj = s.studentId ? state.students.find(st => st.id === s.studentId) || null : null;
+      return {
+        id: s.id,
+        isGhost: !!s.isGhost,
+        excluded: !!s.excluded,
+        isLocked: !!s.isLocked,
+        orderIdx: s.orderIdx,
+        colIdx: s.colIdx,
+        rowIdx: s.rowIdx,
+        fixedFor: s.fixedFor || null,
+        student: studentObj
+      };
+    });
+
+    return true;
+  } catch (err) {
+    console.error('Failed to load auto-saved state:', err);
+    return false;
+  }
+}
