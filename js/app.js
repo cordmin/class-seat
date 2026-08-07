@@ -902,7 +902,8 @@ function onSeatCountChange() {
 }
 
 function onColCountChange() {
-  cfg.colCount = Math.max(1, Math.min(10, parseInt(document.getElementById('col-count').value) || 5));
+  cfg.colCount = Math.max(2, Math.min(6, parseInt(document.getElementById('col-count').value) || 5));
+  document.getElementById('col-count').value = cfg.colCount;
   initSeats();
 }
 
@@ -1350,7 +1351,7 @@ function toggleTeacherView() {
 
   if (teacherView) {
     if (checkbox) checkbox.checked = true;
-    blackboard.innerHTML = '칠판 <span style="font-size:11px;color:#a7f3c4;font-weight:400;">— 교사 시점</span>';
+    blackboard.textContent = '칠판';
     boardArea.classList.add('teacher-mode');
   } else {
     if (checkbox) checkbox.checked = false;
