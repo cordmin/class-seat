@@ -517,8 +517,9 @@ export function resetStudentList() {
     state.students = [];
     if (state.seats && Array.isArray(state.seats)) {
       state.seats.forEach(s => {
-        s.studentId = null;
-        s.fixedStudentId = null;
+        s.student = null;
+        s.fixedFor = null;
+        s.isLocked = false;
       });
     }
 
