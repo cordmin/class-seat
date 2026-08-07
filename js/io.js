@@ -1,4 +1,4 @@
-import { state, cfg, INIT_ROWS, LAYOUTS } from './state.js';
+import { state, cfg, INIT_ROWS, LAYOUTS, saveAutoState } from './state.js';
 import { initSeats, updateSelectLogic, onSeatCountChange, applyAlgo } from './layout.js';
 import { renderSeats, updateBadge } from './view.js';
 import { toast, updateStudentListPreview } from './ui.js';
@@ -91,10 +91,7 @@ export async function loadStudentExcel() {
   const res = await window.pywebview.api.load_excel();
   if (res && res.ok) {
     state.students = res.students;
-    const countEl = document.getElementById('count-num');
-    if (countEl) countEl.textContent = state.students.length;
-    const btnView = document.getElementById('btn-view-students');
-    if (btnView) btnView.style.display = 'block';
+    updateStudentListPreview();
     const seatInput = document.getElementById('seat-count');
     if (seatInput) {
       seatInput.value = state.students.length;
@@ -224,7 +221,7 @@ export async function exportToExcel() {
   <!-- 불러온 명단 확인 모달 -->
   <div id="student-list-modal" class="mbg" style="display:none; z-index:900;">
     <div class="modal" style="width: min(400px, 92vw); max-height:80vh; display:flex; flex-direction:column; padding:0; overflow:hidden; border-radius:16px;">
-      <div style="padding:16px 20px; background:var(--accent); color:#fff; display:flex; justify-content:space-between; align-items:center;">
+      <div style="padding:16px 20px; background:#F18BA7; color:#fff; display:flex; justify-content:space-between; align-items:center;">
         <h3 style="margin:0; font-size:16px; color:#fff; font-weight:800;">현재 적용된 학생 명단</h3>
         <button onclick="closeStudentModal()" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer; line-height:1;">&times;</button>
       </div>
@@ -513,4 +510,19 @@ export function processLoadedData(jsonStr) {
   } catch {
     toast('잘못된 파일 형식입니다.', true);
   }
+}
+
+export function resetStudentList() {
+  if (!state.students || state.students.length === 0) {
+    toast('초기화할 학생 명단이 없습니다.', true);
+    return;
+  }
+  state.students = [];
+  updateStudentListPreview();
+  const rows = document.querySelectorAll('#student-grid-body .student-row');
+  rows.forEach(r => {
+    r.querySelectorAll('input').forEach(i => i.value = '');
+  });
+  toast('학생 명단이 초기화되었습니다.');
+  if (typeof saveAutoState === 'function') saveAutoState();
 }

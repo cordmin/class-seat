@@ -80,7 +80,24 @@ export function hideSaveMenu() {
   }
 }
 
+export function updateStudentCountBadge() {
+  const btnView = document.getElementById('btn-view-students');
+  const countEl = document.getElementById('count-num');
+  const count = state.students ? state.students.length : 0;
+  
+  if (countEl) countEl.textContent = count;
+  if (btnView) {
+    if (count > 0) {
+      btnView.style.display = 'inline-flex';
+      btnView.style.alignItems = 'center';
+    } else {
+      btnView.style.display = 'none';
+    }
+  }
+}
+
 export function updateStudentListPreview() {
+  updateStudentCountBadge();
   const el = document.getElementById('student-list-preview');
   if (!el) return;
   if (state.students.length === 0) {
@@ -90,7 +107,7 @@ export function updateStudentListPreview() {
 
   el.innerHTML = state.students.map(s =>
     `<div style="display:flex;gap:8px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.05);">
-       <span style="background:var(--accent);color:#fff;border-radius:4px;padding:0 5px;font-size:10px;font-weight:800;min-width:24px;text-align:center;line-height:1.9;">${s.id}</span>
+       <span style="background:#F18BA7;color:#fff;border-radius:4px;padding:0 5px;font-size:10px;font-weight:800;min-width:24px;text-align:center;line-height:1.9;">${s.id}</span>
        <span>${s.name}</span>
        ${s.gender ? `<span style="color:${s.gender==='남'?'#60a5fa':'#f472b6'};font-size:10px;">${s.gender}</span>` : ''}
      </div>`
@@ -109,7 +126,7 @@ export function openStudentModal() {
     if (s.gender === '남') genderBadge = `<span style="background:#dbeafe; color:#1e40af; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:800; display:inline-flex; align-items:center; gap:3px;">♂ 남</span>`;
     else if (s.gender === '여') genderBadge = `<span style="background:#fce7f3; color:#9d174d; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:800; display:inline-flex; align-items:center; gap:3px;">♀ 여</span>`;
     return `<div style="display:flex; align-items:center; gap:12px; padding:10px 14px; border-bottom:1px solid var(--border2); background:#fff; border-radius:10px; margin-bottom:6px; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
-      <div style="background:var(--accent); color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:900; flex-shrink:0;">${s.id}</div>
+      <div style="background:#F18BA7; color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:900; flex-shrink:0;">${s.id}</div>
       <div style="flex:1; font-weight:800; font-size:14px; color:var(--text1);">${s.name}</div>
       <div>${genderBadge}</div>
     </div>`;

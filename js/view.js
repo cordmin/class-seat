@@ -292,7 +292,7 @@ function openContextMenu(x, y, seat) {
   state.students.forEach(st => {
     const btn = document.createElement('div');
     btn.className = 'ctx-item';
-    btn.innerHTML = `<span style="background:var(--accent);color:#fff;border-radius:4px;padding:1px 5px;font-size:10px;font-weight:800;min-width:20px;text-align:center;">${st.id}</span> ${st.name}`;
+    btn.innerHTML = `<span style="background:#F18BA7;color:#fff;border-radius:4px;padding:1px 5px;font-size:10px;font-weight:800;min-width:20px;text-align:center;">${st.id}</span> ${st.name}`;
     btn.onclick = () => {
       seat.fixedFor = st.id;
       seat.isLocked = false;
@@ -353,58 +353,94 @@ export function executeArrangement() {
 
   const useCountdown = document.getElementById('countdown-opt').checked;
   if (useCountdown) {
-    renderSeats();
+    // 카운트다운 완료 후 renderSeats()가 실행되도록 카운트다운 시작
     startArrangeCountdown(previousSeatsState);
   } else {
     renderSeats();
+    setBubbleText('<span style="font-size:15px; font-weight:800;">배치 완료! 🎉</span>');
     toast('배치가 완료되었습니다!');
+    setTimeout(() => {
+      if (!state.countdownTimer) setBubbleText('오늘의 자리를 배치해볼까요?');
+    }, 3000);
+  }
+}
+
+let currentCancelClickHandler = null;
+
+export function cleanupCountdownEvents() {
+  if (currentCancelClickHandler) {
+    window.removeEventListener('click', currentCancelClickHandler, true);
+    currentCancelClickHandler = null;
+  }
+}
+
+export function setBubbleText(htmlContent, isCounting = false) {
+  const bubble = document.getElementById('char-bubble');
+  const bubbleText = document.getElementById('bubble-text');
+  if (bubbleText) bubbleText.innerHTML = htmlContent;
+  if (bubble) {
+    if (isCounting) bubble.classList.add('counting');
+    else bubble.classList.remove('counting');
   }
 }
 
 export function cancelArrangement() {
   state.isArrangementCancelled = true;
   clearInterval(state.countdownTimer);
-  const overlay = document.getElementById('countdown-overlay');
-  if (overlay) overlay.style.display = 'none';
+  state.countdownTimer = null;
+  cleanupCountdownEvents();
   if (state.prevStateJson) {
     state.seats = JSON.parse(state.prevStateJson);
   }
   renderSeats();
+  setBubbleText('<span style="font-size:14px;">배치가 취소되었습니다 😅</span>');
   toast('자리 배치가 취소되었습니다.', true);
+  setTimeout(() => {
+    if (!state.countdownTimer) setBubbleText('오늘의 자리를 배치해볼까요?');
+  }, 2500);
 }
 
 export function startArrangeCountdown(prevState) {
   state.isArrangementCancelled = false;
   state.prevStateJson = prevState;
+  cleanupCountdownEvents();
   let n = 5;
-  const overlay = document.getElementById('countdown-overlay');
-  const numEl = document.getElementById('countdown-num');
-  if (!overlay || !numEl) return;
 
-  overlay.style.display = 'flex';
-  numEl.textContent = n;
-  playBeep(440, 0.1, 0.1);
+  setBubbleText(`<span style="font-size:15px;">공개까지 <span style="font-size:21px; font-weight:900; color:#f43f5e; margin:0 2px;">${n}</span>초 전!</span>`, true);
+  playBeep(440, 0.1, 0.13);
 
-  const clickHandler = () => {
-    if (state.countdownTimer && !state.isArrangementCancelled) cancelArrangement();
-  };
-  overlay.addEventListener('click', clickHandler);
+  // 카운트다운 실행 중 프로그램 내부 임의 클릭 시 즉시 취소 핸들러 등록
+  setTimeout(() => {
+    if (state.countdownTimer && !state.isArrangementCancelled) {
+      currentCancelClickHandler = (e) => {
+        if (state.countdownTimer && !state.isArrangementCancelled) {
+          cancelArrangement();
+        }
+      };
+      window.addEventListener('click', currentCancelClickHandler, true);
+    }
+  }, 50);
 
   state.countdownTimer = setInterval(() => {
     if (state.isArrangementCancelled) {
-      overlay.removeEventListener('click', clickHandler);
+      cleanupCountdownEvents();
       return;
     }
     n--;
     if (n <= 0) {
       clearInterval(state.countdownTimer);
-      overlay.removeEventListener('click', clickHandler);
-      playBeep(880, 0.5, 0.2);
-      overlay.style.display = 'none';
+      state.countdownTimer = null;
+      cleanupCountdownEvents();
+      playBeep(880, 0.5, 0.26);
+      renderSeats();
+      setBubbleText('<span style="font-size:15px; font-weight:800;">배치 완료! 🎉</span>');
       toast('배치가 공개되었습니다!');
+      setTimeout(() => {
+        if (!state.countdownTimer) setBubbleText('오늘의 자리를 배치해볼까요?');
+      }, 3000);
     } else {
-      playBeep(440, 0.1, 0.1);
-      numEl.textContent = n;
+      playBeep(440, 0.1, 0.13);
+      setBubbleText(`<span style="font-size:15px;">공개까지 <span style="font-size:21px; font-weight:900; color:#f43f5e; margin:0 2px;">${n}</span>초 전!</span>`, true);
     }
   }, 1000);
 }

@@ -3,10 +3,10 @@
   :root {
     --bg: #fdf8f3;
     --panel: #ffffff;
-    --sidebar: #6E523A;
+    --sidebar: #F6CAD7;
     --sidebar2: #fdf6ef;
-    --accent: #a0714a;
-    --accent2: #7a5030;
+    --accent: #7d5334;
+    --accent2: #59361e;
     --text1: #3e2410;
     --text2: #6b4425;
     --textm: #9a7255;
@@ -53,13 +53,14 @@
     width: var(--sb-width);
     min-width: var(--sb-width);
     max-width: var(--sb-width);
-    padding-top: 125px;
+    padding-top: 25px;
     background: var(--sidebar);
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: visible;
     position: relative;
     user-select: none;
+    z-index: 20;
   }
 
   #sb-header {
@@ -147,8 +148,8 @@
     box-shadow: 0 1px 3px rgba(0,0,0,.15);
   }
   .switch input:checked + .slider {
-    background: var(--accent);
-    border-color: var(--accent);
+    background: #F18BA7;
+    border-color: #F18BA7;
   }
   .switch input:checked + .slider::before {
     transform: translateX(18px);
@@ -162,7 +163,7 @@
 
   .sb-body {
     flex: 1;
-    overflow: hidden;
+    overflow: visible;
     padding: 0 12px 16px;
     margin-top: 0 !important;
     position: static !important;
@@ -173,9 +174,10 @@
   .card {
     background: var(--sidebar2);
     border: 1px solid var(--border2);
-    border-radius: 10px;
-    margin-bottom: 24px;
-    overflow: hidden;
+    border-radius: 15px;
+    margin-bottom: 12px;
+    overflow: visible;
+    position: relative;
   }
 
   .card-head {
@@ -209,7 +211,7 @@
     width: 100%;
     background: #ffffff;
     border: 1px solid var(--border2);
-    border-radius: 6px;
+    border-radius: 9px;
     color: var(--text1);
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 12px;
@@ -235,7 +237,7 @@
     background: var(--accent);
     color: #fff;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 10px 20px;
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 16px;
@@ -246,8 +248,8 @@
     transition: opacity .15s, transform .1s;
     box-shadow: none;
   }
-  .exec-btn:hover { opacity: .9; transform: translateY(-1px); }
-  .exec-btn:active { transform: translateY(0); }
+  .exec-btn:hover { opacity: 1; transform: translateY(-2px); }
+  .exec-btn:active { opacity: 1; transform: translateY(0); }
 
   /* 사이드바 배치 실행 버튼 (보조용) */
   .exec-btn-sm {
@@ -255,7 +257,7 @@
     background: var(--accent);
     color: #fff;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     padding: 11px;
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 13px;
@@ -274,6 +276,7 @@
     background: #fff;
     color: var(--text1);
     border: 1px solid var(--border2);
+    border-radius: 10px;
     box-shadow: none;
     font-weight: 700;
     font-size: 13px;
@@ -474,10 +477,10 @@
   #seats-wrap {
     order: 3;
     background: var(--panel);
-    border: 2px solid var(--border);
+    border: 2.5px solid var(--sidebar);
     border-radius: 12px;
     padding: 24px;
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 4px 14px rgba(246, 202, 215, 0.4);
     display: inline-block;
   }
 
@@ -612,34 +615,108 @@
     z-index: 10;
   }
 
-  /* Countdown overlay */
-  #countdown-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    z-index: 999;
-    background: #000000;
+  /* Speech Bubble (말풍선) */
+  .speech-bubble {
+    position: relative;
+    background: #ffffff;
+    border: 2px solid #F18BA7;
+    border-radius: 14px;
+    padding: 8px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text1);
+    box-shadow: 0 4px 12px rgba(241,139,167,0.15);
+    flex: 1;
+    word-break: keep-all;
+    line-height: 1.35;
+    display: flex;
     align-items: center;
     justify-content: center;
-    flex-direction: column;
-    gap: 16px;
+    text-align: center;
+    height: 75px;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s, border-color 0.2s;
+    user-select: none;
   }
-  #countdown-num {
-    font-size: min(200px,30vw);
-    font-weight: 900;
-    color: #fff;
-    line-height: 1;
+  .speech-bubble::before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-style: solid;
+    border-width: 6px 8px 6px 0;
+    border-color: transparent #F18BA7 transparent transparent;
   }
-  #countdown-label {
-    font-size: 18px;
-    font-weight: 700;
-    color: rgba(255,255,255,.7);
-    letter-spacing: .05em;
+  .speech-bubble::after {
+    content: '';
+    position: absolute;
+    left: -5px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-style: solid;
+    border-width: 5px 6px 5px 0;
+    border-color: transparent #ffffff transparent transparent;
   }
-  #countdown-cancel-info {
-    font-size: 14px;
-    color: #6b7280;
-    margin-top: 20px;
-    font-weight: 400;
+  .speech-bubble.counting {
+    background: #fff0f5;
+    border-color: #f43f5e;
+    cursor: pointer;
+    animation: bubblePulse 0.6s infinite alternate ease-in-out;
+  }
+  @keyframes bubblePulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.03); }
+  }
+
+  /* Custom Top Tooltip (상단 말풍선 툴팁) */
+  .tooltip-wrap {
+    position: relative;
+    display: inline-flex;
+  }
+  .tooltip-wrap .custom-tooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: calc(50% + 5px);
+    transform: translateX(-50%) translateY(4px);
+    background: #ffffff;
+    color: #ef4444;
+    border: 1.5px solid #fca5a5;
+    padding: 4px 8px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(239,68,68,0.15);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 100;
+  }
+  .tooltip-wrap .custom-tooltip::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-style: solid;
+    border-width: 6px 6px 0 6px;
+    border-color: #fca5a5 transparent transparent transparent;
+  }
+  .tooltip-wrap .custom-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-style: solid;
+    border-width: 5px 5px 0 5px;
+    border-color: #ffffff transparent transparent transparent;
+  }
+  .tooltip-wrap:hover .custom-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
   }
 
   /* Toast */
@@ -647,7 +724,7 @@
     position: fixed;
     bottom: 24px; left: 50%;
     transform: translateX(-50%) translateY(20px);
-    background: var(--text1);
+    background: #F18BA7;
     color: #fff;
     padding: 12px 24px;
     border-radius: 10px;
@@ -658,7 +735,7 @@
     pointer-events: none;
     z-index: 9999;
     white-space: nowrap;
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 6px 20px rgba(241,139,167,0.35);
     text-align: center;
   }
   #toast.error {

@@ -139,6 +139,14 @@ class Api:
         except Exception as e:
             return {'ok': False, 'error': str(e)}
 
+    def open_url(self, url: str):
+        import webbrowser
+        try:
+            webbrowser.open(url)
+            return {'ok': True}
+        except Exception as e:
+            return {'ok': False, 'error': str(e)}
+
 
 # ── 메인 ──────────────────────────────────────────────────────────────────────
 def main():

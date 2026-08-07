@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>카운트다운 효과음 테스트 샘플</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #fdf6ef;
+      color: #3e2410;
+      padding: 30px;
+      max-width: 650px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 22px;
+      color: #F18BA7;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .card {
+      background: #ffffff;
+      border: 2px solid #F18BA7;
+      border-radius: 16px;
+      padding: 18px 22px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 14px rgba(241,139,167,0.2);
+    }
+    .card h2 {
+      font-size: 16px;
+      margin-top: 0;
+      margin-bottom: 8px;
+      color: #b91c1c;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card p {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 14px;
+    }
+    button {
+      background: #F18BA7;
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    button:hover {
+      background: #e07493;
+      transform: translateY(-1px);
+    }
+    .count-display {
+      font-size: 18px;
+      font-weight: 900;
+      color: #ef4444;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎵 자리배치 카운트다운 효과음 선택 테스트</h1>
+
+  <!-- 스타일 1 -->
+  <div class="card">
+    <h2>1. 8비트 아케이드 레트로 비프음 <span class="count-display" id="disp-1"></span></h2>
+    <p>기존 비프음 볼륨을 상향하고 주파수 상승(440Hz ➔ 880Hz)을 적용한 클래식 카운터음</p>
+    <button onclick="playStyle1()">카운트다운(5~1초) 소리 듣기</button>
+  </div>
+
+  <!-- 스타일 2 -->
+  <div class="card">
+    <h2>2. 신나는 마림바 (목금 타악기) <span class="count-display" id="disp-2"></span></h2>
+    <p>톡-톡-톡 통통 튀는 명랑하고 신나는 실로폰/마림바 아날로그 타악기 음</p>
+    <button onclick="playStyle2()">카운트다운(5~1초) 소리 듣기</button>
+  </div>
+
+  <!-- 스타일 3 -->
+  <div class="card">
+    <h2>3. 귀여운 버블 팝 물방울 소리 <span class="count-display" id="disp-3"></span></h2>
+    <p>퐁! 퐁! 퐁! 퐁! 귀엽고 깜찍한 물방울 팝 효과음</p>
+    <button onclick="playStyle3()">카운트다운(5~1초) 소리 듣기</button>
+  </div>
+
+  <!-- 스타일 4 -->
+  <div class="card">
+    <h2>4. 맑고 영롱한 벨 & 차임 오르골 <span class="count-display" id="disp-4"></span></h2>
+    <p>쨍- 쨍- 맑고 화사하게 울리는 차임 벨 오르골 소리</p>
+    <button onclick="playStyle4()">카운트다운(5~1초) 소리 듣기</button>
+  </div>
+
+  <!-- 스타일 5 -->
+  <div class="card">
+    <h2>5. 경쾌한 틱톡 아날로그 타이머 <span class="count-display" id="disp-5"></span></h2>
+    <p>착! 착! 착! 또박또박 짚어주는 신나는 타이머 소리</p>
+    <button onclick="playStyle5()">카운트다운(5~1초) 소리 듣기</button>
+  </div>
+
+  <script>
+    let audioCtx = null;
+    function getAudioCtx() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    let activeTimer = null;
+
+    function stopTimer() {
+      if (activeTimer) clearInterval(activeTimer);
+    }
+
+    // 스타일 1: 레트로 비프
+    function playStyle1() {
+      stopTimer();
+      const ctx = getAudioCtx();
+      let n = 5;
+      document.getElementById('disp-1').textContent = n;
+      
+      const step = () => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440 + (5 - n) * 40, ctx.currentTime);
+        gain.gain.setValueAtTime(0.18, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.12);
+      };
+      
+      step();
+      activeTimer = setInterval(() => {
+        n--;
+        if (n <= 0) {
+          clearInterval(activeTimer);
+          document.getElementById('disp-1').textContent = '완료! 🎉';
+          // 완료음
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(880, ctx.currentTime);
+          gain.gain.setValueAtTime(0.3, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.35);
+        } else {
+          document.getElementById('disp-1').textContent = n;
+          step();
+        }
+      }, 1000);
+    }
+
+    // 스타일 2: 마림바
+    function playStyle2() {
+      stopTimer();
+      const ctx = getAudioCtx();
+      let n = 5;
+      const freqs = [523.25, 587.33, 659.25, 698.46, 783.99]; // C5 ~ G5
+      document.getElementById('disp-2').textContent = n;
+
+      const step = (idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freqs[idx % freqs.length], ctx.currentTime);
+        gain.gain.setValueAtTime(0.35, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.25);
+      };
+
+      step(5 - n);
+      activeTimer = setInterval(() => {
+        n--;
+        if (n <= 0) {
+          clearInterval(activeTimer);
+          document.getElementById('disp-2').textContent = '완료! 🎉';
+          // 화려한 팡파레 마림바
+          [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+            setTimeout(() => {
+              const osc = ctx.createOscillator();
+              const gain = ctx.createGain();
+              osc.type = 'triangle';
+              osc.frequency.setValueAtTime(f, ctx.currentTime);
+              gain.gain.setValueAtTime(0.3, ctx.currentTime);
+              gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+              osc.connect(gain);
+              gain.connect(ctx.destination);
+              osc.start();
+              osc.stop(ctx.currentTime + 0.4);
+            }, i * 70);
+          });
+        } else {
+          document.getElementById('disp-2').textContent = n;
+          step(5 - n);
+        }
+      }, 1000);
+    }
+
+    // 스타일 3: 버블 팝
+    function playStyle3() {
+      stopTimer();
+      const ctx = getAudioCtx();
+      let n = 5;
+      document.getElementById('disp-3').textContent = n;
+
+      const step = () => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(300 + (5 - n) * 80, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(800 + (5 - n) * 100, ctx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.4, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.08);
+      };
+
+      step();
+      activeTimer = setInterval(() => {
+        n--;
+        if (n <= 0) {
+          clearInterval(activeTimer);
+          document.getElementById('disp-3').textContent = '완료! 🎉';
+          // 신나는 퐁퐁퐁 팝
+          [600, 800, 1000, 1200].forEach((f, i) => {
+            setTimeout(() => {
+              const osc = ctx.createOscillator();
+              const gain = ctx.createGain();
+              osc.type = 'sine';
+              osc.frequency.setValueAtTime(f, ctx.currentTime);
+              osc.frequency.exponentialRampToValueAtTime(f * 1.5, ctx.currentTime + 0.1);
+              gain.gain.setValueAtTime(0.35, ctx.currentTime);
+              gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+              osc.connect(gain);
+              gain.connect(ctx.destination);
+              osc.start();
+              osc.stop(ctx.currentTime + 0.1);
+            }, i * 60);
+          });
+        } else {
+          document.getElementById('disp-3').textContent = n;
+          step();
+        }
+      }, 1000);
+    }
+
+    // 스타일 4: 차임 벨
+    function playStyle4() {
+      stopTimer();
+      const ctx = getAudioCtx();
+      let n = 5;
+      const freqs = [880, 987.77, 1046.50, 1174.66, 1318.51];
+      document.getElementById('disp-4').textContent = n;
+
+      const step = (idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freqs[idx % freqs.length], ctx.currentTime);
+        gain.gain.setValueAtTime(0.25, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.5);
+      };
+
+      step(5 - n);
+      activeTimer = setInterval(() => {
+        n--;
+        if (n <= 0) {
+          clearInterval(activeTimer);
+          document.getElementById('disp-4').textContent = '완료! 🎉';
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(1760, ctx.currentTime);
+          gain.gain.setValueAtTime(0.3, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.8);
+        } else {
+          document.getElementById('disp-4').textContent = n;
+          step(5 - n);
+        }
+      }, 1000);
+    }
+
+    // 스타일 5: 틱톡
+    function playStyle5() {
+      stopTimer();
+      const ctx = getAudioCtx();
+      let n = 5;
+      document.getElementById('disp-5').textContent = n;
+
+      const step = () => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(1200, ctx.currentTime);
+        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.03);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.03);
+      };
+
+      step();
+      activeTimer = setInterval(() => {
+        n--;
+        if (n <= 0) {
+          clearInterval(activeTimer);
+          document.getElementById('disp-5').textContent = '완료! 🎉';
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(1200, ctx.currentTime);
+          gain.gain.setValueAtTime(0.3, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.4);
+        } else {
+          document.getElementById('disp-5').textContent = n;
+          step();
+        }
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
