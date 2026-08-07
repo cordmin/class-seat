@@ -796,31 +796,7 @@
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-head">📏 책상 크기 &amp; 간격 조절</div>
-        <div class="card-body">
-          <div class="slider-row">
-            <span class="slider-label">줄 간격</span>
-            <input type="range" id="row-gap-range" min="0" max="60" value="8" oninput="onGapChange()">
-          </div>
-          <div class="slider-row">
-            <span class="slider-label">열 간격</span>
-            <input type="range" id="col-gap-range" min="0" max="60" value="48" oninput="onGapChange()">
-          </div>
-        </div>
-      </div>
 
-      <div class="card">
-        <div class="card-head">🔤 글꼴 선택</div>
-        <div class="card-body">
-          <select class="inp" id="font-family" onchange="onFontChange()">
-            <option value="'Gowun Dodum', sans-serif">고운 돋움</option>
-            <option value="'Noto Sans KR', sans-serif">노토 산스</option>
-            <option value="'Poor Story', cursive">푸어 스토리</option>
-            <option value="'Gowun Batang', serif">고운 바탕</option>
-          </select>
-        </div>
-      </div>
 
     </div></div></div><div id="sb-resizer"></div>
 
@@ -1807,15 +1783,18 @@ function onColCountChange() {
 }
 
 function onGapChange() {
-  cfg.rowGap = parseInt(document.getElementById('row-gap-range').value) || 0;
-  cfg.colGap = parseInt(document.getElementById('col-gap-range').value) || 0;
+  const rEl = document.getElementById('row-gap-range');
+  const cEl = document.getElementById('col-gap-range');
+  if (rEl) cfg.rowGap = parseInt(rEl.value) || 0;
+  if (cEl) cfg.colGap = parseInt(cEl.value) || 0;
   document.documentElement.style.setProperty('--row-gap', cfg.rowGap + 'px');
   document.documentElement.style.setProperty('--col-gap', cfg.colGap + 'px');
   renderSeats();
 }
 
 function onFontChange() {
-  cfg.fontFamily = document.getElementById('font-family').value;
+  const el = document.getElementById('font-family');
+  cfg.fontFamily = el ? el.value : "'Gowun Dodum', sans-serif";
   document.documentElement.style.setProperty('--seat-font', cfg.fontFamily);
 }
 
@@ -1938,19 +1917,21 @@ function processLoadedData(jsonStr) {
       document.getElementById('layout-type').value = 'single';
     }
     
-    document.getElementById('row-gap-range').value = cfg.rowGap;
-    document.getElementById('col-gap-range').value = cfg.colGap;
+    // row-gap-range removed
+    // col-gap-range removed
     
     if(cfg.fontFamily) {
-      const fontSelect = document.getElementById('font-family');
-      const optionExists = Array.from(fontSelect.options).some(opt => opt.value === cfg.fontFamily);
-      if (optionExists) {
-        fontSelect.value = cfg.fontFamily;
-      } else {
-        cfg.fontFamily = "'Gowun Dodum', sans-serif";
-        fontSelect.value = cfg.fontFamily;
-      }
+  const fontSelect = document.getElementById('font-family');
+  if (fontSelect) {
+    const optionExists = Array.from(fontSelect.options).some(opt => opt.value === cfg.fontFamily);
+    if (optionExists) {
+      fontSelect.value = cfg.fontFamily;
+    } else {
+      cfg.fontFamily = "'Gowun Dodum', sans-serif";
+      fontSelect.value = cfg.fontFamily;
     }
+  }
+}
     
     updateSelectLogic();
     
@@ -2329,8 +2310,9 @@ initGrid(INIT_ROWS);
 updateSelectLogic(); 
 initSeats();
 updateStudentListPreview();
-document.getElementById('font-family').value = cfg.fontFamily;
-onFontChange();
+// font-family removed
+cfg.fontFamily = "'Gowun Dodum', sans-serif";
+  document.documentElement.style.setProperty('--seat-font', cfg.fontFamily);
 </script>
 </body>
 </html>
