@@ -474,6 +474,12 @@ export function fitToWorkspace() {
     const scaleY = scalableAvailH / baseTotalH;
     let scale = Math.min(scaleX, scaleY);
 
+    // Slightly enlarge the whole seating layout in teacher mode so the board
+    // doesn't visually collide with the seat area and spacing appears balanced.
+    if (isTeacherMode) {
+      scale *= 1.12; // 12% larger in teacher view
+    }
+
     if (scale > 1.8) scale = 1.8;
     if (scale < 0.25) scale = 0.25;
 
