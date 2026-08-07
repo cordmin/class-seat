@@ -319,7 +319,7 @@ export async function printScreen() {
 
   const printWrap = document.createElement('div');
   printWrap.id = 'temp-print-wrap';
-  printWrap.style.cssText = 'position:fixed; left:50%; top:50%; width:1020px; background:#ffffff; padding:15px; box-sizing:border-box; display:flex; flex-direction:row; gap:20px; align-items:center; justify-content:center; transform:translate(-50%,-50%); transform-origin:center center; z-index:99999;';
+  printWrap.style.cssText = 'position:fixed; left:50%; top:50%; width:max-content; max-width:none; background:#ffffff; padding:15px; box-sizing:border-box; display:flex; flex-direction:row; gap:20px; align-items:center; justify-content:center; transform:translate(-50%,-50%); transform-origin:center center; z-index:99999;';
 
   // 1. 좌측 학생 명단 표 생성 (번호 | 이름 | 성별)
   const listDiv = document.createElement('div');
