@@ -322,7 +322,7 @@ export async function printScreen() {
 
   const printWrap = document.createElement('div');
   printWrap.id = 'temp-print-wrap';
-  printWrap.style.cssText = 'position:absolute; left:0; top:0; width:1020px; background:#ffffff; padding:15px; box-sizing:border-box; display:flex; flex-direction:row; gap:20px; align-items:flex-start; justify-content:flex-start; z-index:99999;';
+  printWrap.style.cssText = 'position:fixed; left:50%; top:50%; width:1020px; background:#ffffff; padding:15px; box-sizing:border-box; display:flex; flex-direction:row; gap:20px; align-items:center; justify-content:center; transform:translate(-50%,-50%); transform-origin:center center; z-index:99999;';
 
   // 1. 좌측 학생 명단 표 생성 (번호 | 이름 | 성별)
   const listDiv = document.createElement('div');
@@ -331,7 +331,7 @@ export async function printScreen() {
   let tableHtml = `
     <table style="width:100%; border-collapse:collapse; font-family:'Noto Sans KR', 'Malgun Gothic', sans-serif; font-size:11px; border:2px solid #000000;">
       <thead>
-        <tr style="background:#fbbf24; color:#000000; font-size:12px; font-weight:900; -webkit-print-color-adjust:exact; print-color-adjust:exact;">
+        <tr style="background:#fce7f3; color:#000000; font-size:12px; font-weight:900; -webkit-print-color-adjust:exact; print-color-adjust:exact;">
           <th style="border:1px solid #000000; padding:4px 2px; width:45px; text-align:center;">번호</th>
           <th style="border:1px solid #000000; padding:4px 2px; text-align:center;">이 름</th>
           <th style="border:1px solid #000000; padding:4px 2px; width:45px; text-align:center;">성별</th>
@@ -384,17 +384,15 @@ export async function printScreen() {
   printWrap.appendChild(rightWrap);
   document.body.appendChild(printWrap);
 
-  // A4 가로 1페이지 초과 방지 자동 스케일링
-  const targetW = 990;
-  const targetH = 650;
+  // A4 가로 1페이지 완벽 중앙 정렬 및 자동 스케일링
+  const targetW = 980;
+  const targetH = 640;
   const w = printWrap.scrollWidth || 1020;
   const h = printWrap.scrollHeight || 700;
   const scale = Math.min(targetW / w, targetH / h, 1);
-  if (scale < 1) {
-    printWrap.style.transform = `scale(${scale})`;
-    printWrap.style.transformOrigin = 'top left';
-    printWrap.style.width = `${w}px`;
-  }
+  
+  printWrap.style.transform = `translate(-50%, -50%) scale(${scale})`;
+  printWrap.style.transformOrigin = 'center center';
 
   setTimeout(() => {
     window.print();

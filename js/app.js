@@ -60,6 +60,11 @@ if (loaded) {
   if (colInput) colInput.value = cfg.colCount;
   if (layoutSelect) layoutSelect.value = cfg.layoutType;
   if (teacherToggle) teacherToggle.checked = state.teacherView;
+  const boardArea = document.getElementById('board-area');
+  if (boardArea) {
+    if (state.teacherView) boardArea.classList.add('teacher-mode');
+    else boardArea.classList.remove('teacher-mode');
+  }
 
   updateSelectLogic();
   updateBadge();

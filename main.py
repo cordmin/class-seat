@@ -146,7 +146,7 @@ def main():
     api = Api()
 
     window = webview.create_window(
-        title='학급 자리배치 프로그램 — KYUNGMINAI',
+        title='DOT JARI 1.2',
         url=f'file:///{html_path.replace(os.sep, "/")}',
         js_api=api,
         width=1280,
