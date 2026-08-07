@@ -725,11 +725,15 @@
 
   <div class="sb-body" id="sb-body">
 
-
-
-    </div>
-    
-    
+      <!-- 명렬표 엑셀 관련 버튼 -->
+      <div class="card">
+        <div class="card-head">📊 학생 명렬표 (엑셀)</div>
+        <div class="card-body" style="display:flex; flex-direction:column; gap:6px;">
+          <button class="exec-btn-sm" style="background:#fff; color:var(--text1); border:1px solid var(--border2); box-shadow:0 1px 3px rgba(0,0,0,0.05); width:100%; font-weight:700;" onclick="downloadTemplate()">📄 명렬표 양식 내려받기</button>
+          <button class="exec-btn-sm" style="background:var(--accent); color:#fff; border:none; width:100%; font-weight:700; box-shadow:0 2px 5px rgba(0,0,0,0.1);" onclick="loadStudentExcel()">📂 명렬표 불러오기</button>
+          <button id="btn-view-students" class="exec-btn-sm" style="background:var(--sidebar2); color:var(--text1); border:1px solid var(--border2); width:100%; font-size:11px; margin-top:2px; display:none;" onclick="openStudentModal()">👀 불러온 명단 확인 (<span id="count-num">0</span>명)</button>
+        </div>
+      </div>
 
       <div class="card">
         <div class="card-head">📐 책상 배열
@@ -2050,7 +2054,21 @@ async function exportToExcel() {
 
   tableHtml += '</table>';
 
-  const htmlContent = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"></head><body>${tableHtml}</body></html>`;
+  const htmlContent = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"></head><body>${tableHtml}
+  <!-- 불러온 명단 확인 모달 -->
+  <div id="student-list-modal" class="mbg" style="display:none; z-index:900;">
+    <div class="modal" style="width: min(400px, 92vw); max-height:80vh; display:flex; flex-direction:column; padding:0; overflow:hidden; border-radius:16px;">
+      <div style="padding:16px 20px; background:var(--accent); color:#fff; display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="margin:0; font-size:16px; color:#fff; font-weight:800;">👀 현재 적용된 학생 명단</h3>
+        <button onclick="closeStudentModal()" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer; line-height:1;">&times;</button>
+      </div>
+      <div id="modal-student-list-content" style="padding:16px; overflow-y:auto; flex:1; background:var(--bg);">
+        <!-- students go here -->
+      </div>
+    </div>
+  </div>
+</body>
+</html>`;
   
   const today = new Date();
   const yy = String(today.getFullYear()).slice(-2);
@@ -2191,6 +2209,78 @@ function toggleTeacherView() {
   renderSeats(); 
 }
 
+
+  async function downloadTemplate() {
+    if (!window.pywebview) {
+      toast('브라우저 환경에서는 지원하지 않습니다.', true);
+      return;
+    }
+    const res = await window.pywebview.api.download_template();
+    if (res && res.ok) {
+      toast('양식을 성공적으로 내려받았습니다.');
+    } else if (res && !res.ok && res.error) {
+      toast('저장 취소 또는 오류가 발생했습니다.', true);
+    }
+  }
+
+  async function loadStudentExcel() {
+    if (!window.pywebview) {
+      toast('브라우저 환경에서는 지원하지 않습니다.', true);
+      return;
+    }
+    const res = await window.pywebview.api.load_excel();
+    if (res && res.ok) {
+      students = res.students;
+      const countEl = document.getElementById('count-num');
+      if (countEl) countEl.textContent = students.length;
+      
+      const btnView = document.getElementById('btn-view-students');
+      if (btnView) btnView.style.display = 'block';
+      
+      const seatInput = document.getElementById('seat-count');
+      if (seatInput) {
+        seatInput.value = students.length;
+        onSeatCountChange();
+      } else {
+        initSeats();
+        renderSeats();
+      }
+      toast(`${students.length}명의 학생 명단을 불러왔습니다.`);
+    } else if (res && !res.ok && res.error) {
+      toast('명단을 불러오는 데 실패했습니다: ' + res.error, true);
+    }
+  }
+
+  function openStudentModal() {
+    const m = document.getElementById('student-list-modal');
+    if (!m) return;
+    
+    if (students.length === 0) {
+      toast('불러온 학생 명단이 없습니다.', true);
+      return;
+    }
+    
+    const listHtml = students.map(s => {
+      let genderBadge = '';
+      if (s.gender === '남') genderBadge = `<span style="background:#dbeafe; color:#1e40af; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:800; display:inline-flex; align-items:center; gap:3px;">👦 남</span>`;
+      else if (s.gender === '여') genderBadge = `<span style="background:#fce7f3; color:#9d174d; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:800; display:inline-flex; align-items:center; gap:3px;">👧 여</span>`;
+      
+      return `<div style="display:flex; align-items:center; gap:12px; padding:10px 14px; border-bottom:1px solid var(--border2); background:#fff; border-radius:10px; margin-bottom:6px; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+        <div style="background:var(--accent); color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:900; flex-shrink:0;">${s.id}</div>
+        <div style="flex:1; font-weight:800; font-size:14px; color:var(--text1);">${s.name}</div>
+        <div>${genderBadge}</div>
+      </div>`;
+    }).join('');
+    
+    document.getElementById('modal-student-list-content').innerHTML = listHtml;
+    m.style.display = 'flex';
+  }
+
+  function closeStudentModal() {
+    const m = document.getElementById('student-list-modal');
+    if (m) m.style.display = 'none';
+  }
+
 function showHelp() { document.getElementById('help-modal').style.display = 'flex'; }
 
   function fitToWorkspace() {
@@ -2282,5 +2372,19 @@ updateStudentListPreview();
 cfg.fontFamily = "'Gowun Dodum', sans-serif";
   document.documentElement.style.setProperty('--seat-font', cfg.fontFamily);
 </script>
+
+  <!-- 불러온 명단 확인 모달 -->
+  <div id="student-list-modal" class="mbg" style="display:none; z-index:900;">
+    <div class="modal" style="width: min(400px, 92vw); max-height:80vh; display:flex; flex-direction:column; padding:0; overflow:hidden; border-radius:16px;">
+      <div style="padding:16px 20px; background:var(--accent); color:#fff; display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="margin:0; font-size:16px; color:#fff; font-weight:800;">👀 현재 적용된 학생 명단</h3>
+        <button onclick="closeStudentModal()" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer; line-height:1;">&times;</button>
+      </div>
+      <div id="modal-student-list-content" style="padding:16px; overflow-y:auto; flex:1; background:var(--bg);">
+        <!-- students go here -->
+      </div>
+    </div>
+  </div>
 </body>
+
 </html>
