@@ -20,7 +20,7 @@
         <span id="btn-view-students" style="display:none; background:var(--accent); color:#fff; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:800; cursor:pointer; white-space:nowrap;" onclick="openStudentModal()"><span id="count-num">0</span>명</span>
       </div>
       <div class="card-body" style="display:flex; gap:6px;">
-        <button class="exec-btn-sm outline" style="flex:1;" onclick="downloadTemplate()">명렬표 내려받기</button>
+        <button class="exec-btn-sm outline" style="flex:1;" onclick="downloadTemplate()">양식 내려받기</button>
         <button class="exec-btn-sm outline" style="flex:1;" onclick="loadStudentExcel()">명렬표 불러오기</button>
       </div>
     </div>
@@ -36,13 +36,7 @@
           </div>
           <div>
             <label class="lbl">분단 수</label>
-            <select class="inp inp-num" id="col-count" onchange="onColCountChange()">
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5" selected>5</option>
-              <option value="6">6</option>
-            </select>
+            <input class="inp inp-num" type="number" id="col-count" min="2" max="6" step="1" value="5" onchange="onColCountChange()">
           </div>
         </div>
 
@@ -89,8 +83,8 @@
       <div class="card-head">자리 배치결과</div>
       <div class="card-body">
         <div style="display:flex; gap:5px; margin-top:4px;">
-          <button class="exec-btn-sm" style="flex:1; background:#fff; color:var(--text1); border:1px solid var(--border2); justify-content:center; padding:8px 4px; font-size:11px;" onclick="printScreen()">인쇄하기</button>
-          <button class="exec-btn-sm" id="btn-save-pop" style="flex:1; background:var(--sidebar2); color:var(--text1); border:1px solid var(--border2); justify-content:center; position:relative; padding:8px 4px; font-size:11px;" onclick="toggleSaveMenu(event)">저장하기</button>
+          <button class="exec-btn-sm outline" style="flex:1;" onclick="printScreen()">인쇄하기</button>
+          <button class="exec-btn-sm outline" id="btn-save-pop" style="flex:1; position:relative;" onclick="toggleSaveMenu(event)">저장하기</button>
         </div>
       </div>
     </div>
@@ -158,6 +152,6 @@
   <button class="pop-item-btn" onclick="saveAsImage(); hideSaveMenu();">이미지 파일로 저장</button>
 </div>
 
-<script src="js/app.js"></script>
+<script type="module" src="js/app.js"></script>
 </body>
 </html>
