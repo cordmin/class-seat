@@ -725,33 +725,7 @@
 
   <div class="sb-body" id="sb-body">
 
-      <div class="card">
-        <div class="card-head">📋 학생 명단 입력</div>
-        <div class="card-body">
-          <div style="font-size:11px;color:var(--textm);line-height:1.7;margin-bottom:7px;">
-            <strong style="color:var(--accent);">직접 입력하거나 엑셀에서 복붙하셔도 됩니다.</strong><br>
-            <span style="color:var(--accent2);">성별: 남 / 여 (선택)</span>
-          </div>
 
-          <div class="student-grid-wrap">
-            <div class="student-grid-head">
-              <div>번호</div>
-              <div>이름</div>
-              <div>성별</div>
-            </div>
-            <div class="student-grid-body" id="student-grid-body"></div>
-          </div>
-
-          <div class="student-grid-footer">
-            <button class="grid-action-btn" onclick="addStudentRow()">+ 행 추가</button>
-            <button class="grid-action-btn" onclick="pasteFromClipboard()">📋 붙여넣기</button>
-            <button class="grid-action-btn" onclick="clearGrid()">🗑 초기화</button>
-          </div>
-
-          <button class="exec-btn-sm" style="width:100%; margin-top:8px;" onclick="applyStudents()">✓ 명단 적용</button>
-          <div id="student-count-info" style="font-size:11px;color:var(--textm);text-align:center;margin-top:2px;"></div>
-        </div>
-      </div>
       <div class="card">
         <div class="card-head">👥 등록된 학생 목록</div>
         <div class="card-body">
@@ -1653,6 +1627,7 @@ function buildGridRow(id = '', name = '', gender = '') {
 
 function initGrid(count = INIT_ROWS) {
   const body = document.getElementById('student-grid-body');
+  if (!body) return;
   body.innerHTML = '';
   for (let i = 0; i < count; i++) body.appendChild(buildGridRow());
 }
@@ -1665,7 +1640,8 @@ function clearGrid() {
   initGrid(INIT_ROWS);
 }
 
-document.getElementById('student-grid-body').addEventListener('paste', async (e) => {
+const sgBody = document.getElementById('student-grid-body');
+if (sgBody) sgBody.addEventListener('paste', async (e) => {
   e.preventDefault();
   let text = (e.clipboardData || window.clipboardData).getData('text');
   if(!text) return;
