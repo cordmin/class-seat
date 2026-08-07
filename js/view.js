@@ -50,13 +50,16 @@ export function renderSeats() {
       if (cfg.layoutType === 'group' || cfg.layoutType === 'group6') {
         const blockSeats = colSeats.slice(slotI, slotI + rowPattern.reduce((a, r) => a + r.length, 0));
         const hasValidSeat = blockSeats.some(s => !s.isGhost);
+        const gLabel = document.createElement('div');
+        gLabel.className = 'group-label';
         if (hasValidSeat) {
-          const gLabel = document.createElement('div');
-          gLabel.className = 'group-label';
           gLabel.textContent = `${globalGroupCounter}모둠`;
-          blockDiv.appendChild(gLabel);
           globalGroupCounter++;
+        } else {
+          gLabel.innerHTML = '&nbsp;';
+          gLabel.style.visibility = 'hidden';
         }
+        blockDiv.appendChild(gLabel);
       }
 
       for (const rowCells of rowPattern) {

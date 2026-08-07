@@ -193,15 +193,30 @@ export function applyAlgo(studentList, algo, freeSeats) {
     return result;
   }
 
-  if (algo === 'genderMixCluster' || algo === 'genderMixRow' || algo === 'genderSameGroup') {
+  if (algo === 'genderMixRow') {
+    const startMale = Math.random() < 0.5;
+    freeSeats.forEach((seat, idx) => {
+      let pref = (seat.rowIdx % 2 === 0) ? (startMale ? '남' : '여') : (startMale ? '여' : '남');
+
+      if (seat.fixedFor) {
+        const fixedSt = state.students.find(st => st.id === seat.fixedFor);
+        if (fixedSt && (fixedSt.gender === '남' || fixedSt.gender === '여')) {
+          pref = fixedSt.gender;
+        }
+      }
+
+      result[idx] = popStudent(pref);
+    });
+    return result;
+  }
+
+  if (algo === 'genderMixCluster' || algo === 'genderSameGroup') {
     const startMale = Math.random() < 0.5;
     blocks.forEach((blockObj, blockNumber) => {
       let pref = '남';
       const firstSeat = freeSeats[blockObj.idxs[0]];
       if (algo === 'genderMixCluster') {
         pref = (firstSeat.colIdx % 2 === 0) ? (startMale ? '남' : '여') : (startMale ? '여' : '남');
-      } else if (algo === 'genderMixRow') {
-        pref = (firstSeat.rowIdx % 2 === 0) ? (startMale ? '남' : '여') : (startMale ? '여' : '남');
       } else {
         pref = (blockNumber % 2 === 0) ? (startMale ? '남' : '여') : (startMale ? '여' : '남');
       }
@@ -224,27 +239,42 @@ export function applyAlgo(studentList, algo, freeSeats) {
   }
 
   if (algo === 'genderSeparate') {
-    const startMale = Math.random() < 0.5;
-    let mainPref = startMale ? '남' : '여';
-    let subPref = startMale ? '여' : '남';
+    const startMaleLeft = Math.random() < 0.5;
+    const maleCount = m.length;
 
-    blocks.forEach(blockObj => {
-      let targetPref = mainPref;
-      if (lockedConstraints.has(blockObj.key)) {
-        targetPref = lockedConstraints.get(blockObj.key);
-      } else {
-        let mainPool = mainPref === '남' ? m : f;
-        let subPool = subPref === '남' ? m : f;
-        if (mainPool.length < blockObj.idxs.length && subPool.length >= blockObj.idxs.length) {
-          mainPref = subPref;
-          subPref = targetPref;
-          targetPref = mainPref;
+    // 자리를 분단(colIdx) 및 행(rowIdx) 순서대로 정렬하여 좌/우 구역 생성
+    const sortedIndices = freeSeats.map((seat, idx) => ({ seat, idx }))
+      .sort((a, b) => {
+        if (a.seat.colIdx !== b.seat.colIdx) {
+          return startMaleLeft ? (a.seat.colIdx - b.seat.colIdx) : (b.seat.colIdx - a.seat.colIdx);
+        }
+        return a.seat.rowIdx - b.seat.rowIdx;
+      });
+
+    // 남학생 전용 구역과 여학생 전용 구역으로 분리 배치
+    sortedIndices.forEach(({ seat, idx }, orderPosition) => {
+      let pref = null;
+
+      if (seat.fixedFor) {
+        const fixedSt = state.students.find(st => st.id === seat.fixedFor);
+        if (fixedSt && (fixedSt.gender === '남' || fixedSt.gender === '여')) {
+          pref = fixedSt.gender;
         }
       }
-      blockObj.idxs.forEach((idx) => {
-        result[idx] = popStudent(targetPref);
-      });
+
+      if (!pref) {
+        if (orderPosition < maleCount && m.length > 0) {
+          pref = '남';
+        } else if (f.length > 0) {
+          pref = '여';
+        } else {
+          pref = '남';
+        }
+      }
+
+      result[idx] = popStudent(pref);
     });
+
     return result;
   }
 
