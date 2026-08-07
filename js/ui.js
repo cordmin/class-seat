@@ -1,6 +1,7 @@
 import { state } from './state.js';
 
 let toastTimer;
+let saveMenuOutsideHandler = null;
 
 export function toast(msg, isError = false) {
   const el = document.getElementById('toast');
@@ -42,6 +43,11 @@ export function toggleSaveMenu(e) {
 
   if (pop.style.display === 'block') {
     pop.style.display = 'none';
+    // remove outside click handler if present
+    if (saveMenuOutsideHandler) {
+      document.removeEventListener('click', saveMenuOutsideHandler);
+      saveMenuOutsideHandler = null;
+    }
     return;
   }
 
@@ -51,11 +57,27 @@ export function toggleSaveMenu(e) {
   pop.style.top = (rect.bottom + 4) + 'px';
   pop.style.left = rect.left + 'px';
   pop.style.display = 'block';
+
+  // attach a one-time outside click handler to close the popover when clicking anywhere outside
+  saveMenuOutsideHandler = function(ev) {
+    const clickedInside = pop.contains(ev.target) || (btn && btn.contains && btn.contains(ev.target));
+    if (!clickedInside) {
+      pop.style.display = 'none';
+      document.removeEventListener('click', saveMenuOutsideHandler);
+      saveMenuOutsideHandler = null;
+    }
+  };
+  // delay attaching so the current click that opened the popover doesn't immediately trigger it
+  setTimeout(() => document.addEventListener('click', saveMenuOutsideHandler));
 }
 
 export function hideSaveMenu() {
   const pop = document.getElementById('save-popover');
   if (pop) pop.style.display = 'none';
+  if (saveMenuOutsideHandler) {
+    document.removeEventListener('click', saveMenuOutsideHandler);
+    saveMenuOutsideHandler = null;
+  }
 }
 
 export function updateStudentListPreview() {
