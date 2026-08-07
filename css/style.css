@@ -485,7 +485,7 @@
   /* Match the blackboard top/bottom spacing to workspace top padding (32px) for consistent visual balance */
   #board-area.teacher-mode .blackboard { order: 3; margin-top: 0; }
   #board-area.teacher-mode .board-spacer { order: 4; margin-bottom: 20px; }
-  #board-area.teacher-mode #seats-wrap { order: 1; }
+  #board-area.teacher-mode #seats-wrap { order: 1; margin-top: 28px; }
 
   .cols-container {
     display: flex;
