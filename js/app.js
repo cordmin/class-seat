@@ -1210,7 +1210,7 @@ async function exportToExcel() {
   <div id="student-list-modal" class="mbg" style="display:none; z-index:900;">
     <div class="modal" style="width: min(400px, 92vw); max-height:80vh; display:flex; flex-direction:column; padding:0; overflow:hidden; border-radius:16px;">
       <div style="padding:16px 20px; background:var(--accent); color:#fff; display:flex; justify-content:space-between; align-items:center;">
-        <h3 style="margin:0; font-size:16px; color:#fff; font-weight:800;"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> 현재 적용된 학생 명단</h3>
+        <h3 style="margin:0; font-size:16px; color:#fff; font-weight:800;">현재 적용된 학생 명단</h3>
         <button onclick="closeStudentModal()" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer; line-height:1;">&times;</button>
       </div>
       <div id="modal-student-list-content" style="padding:16px; overflow-y:auto; flex:1; background:var(--bg);">
@@ -1345,15 +1345,15 @@ function toggleTeacherView() {
     btn.style.color = '#1d4ed8';
     btn.style.borderColor = '#93c5fd';
     btn.title = '학생 시점으로 되돌리기';
-    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg> 학생 시점';
-    blackboard.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg> 칠판 <span style="font-size:11px;color:#a7f3c4;font-weight:400;">— 교사 시점</span>';
+    btn.innerHTML = '학생 시점';
+    blackboard.innerHTML = '칠판 <span style="font-size:11px;color:#a7f3c4;font-weight:400;">— 교사 시점</span>';
     boardArea.classList.add('teacher-mode');
   } else {
     btn.style.background = '';
     btn.style.color = '';
     btn.style.borderColor = '';
     btn.title = '교사 시점으로 화면 전환';
-    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg> 교사 시점';
+    btn.innerHTML = '교사 시점';
     blackboard.textContent = '칠판';
     boardArea.classList.remove('teacher-mode');
   }
