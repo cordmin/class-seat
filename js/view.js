@@ -473,8 +473,8 @@ export function fitToWorkspace() {
     document.documentElement.style.setProperty('--cell-h', `${cellH}px`);
     document.documentElement.style.setProperty('--col-gap', `${colGap}px`);
     document.documentElement.style.setProperty('--row-gap', `${rowGap}px`);
-    document.documentElement.style.setProperty('--name-size', `${Math.max(10, 15 * scale)}px`);
-    document.documentElement.style.setProperty('--id-size', `${Math.max(8, 11 * scale)}px`);
+    document.documentElement.style.setProperty('--name-size', `${Math.max(10, 15 * scale + 3)}px`);
+    document.documentElement.style.setProperty('--id-size', `${Math.max(8, 11 * scale + 3)}px`);
 
     const container = document.getElementById('seats-container');
     if (container) container.style.gap = `${colGap}px`;
