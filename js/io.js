@@ -1,7 +1,7 @@
 import { state, cfg, INIT_ROWS, LAYOUTS, saveAutoState } from './state.js';
 import { initSeats, updateSelectLogic, onSeatCountChange, applyAlgo } from './layout.js';
 import { renderSeats, updateBadge } from './view.js';
-import { toast, updateStudentListPreview } from './ui.js';
+import { toast, updateStudentListPreview, customConfirm } from './ui.js';
 
 export function buildGridRow(id = '', name = '', gender = '') {
   const row = document.createElement('div');
@@ -513,16 +513,24 @@ export function processLoadedData(jsonStr) {
 }
 
 export function resetStudentList() {
-  if (!state.students || state.students.length === 0) {
-    toast('초기화할 학생 명단이 없습니다.', true);
-    return;
-  }
-  state.students = [];
-  updateStudentListPreview();
-  const rows = document.querySelectorAll('#student-grid-body .student-row');
-  rows.forEach(r => {
-    r.querySelectorAll('input').forEach(i => i.value = '');
+  customConfirm('학생 명단과 배치된 책상의 학생 정보를 모두 초기화하시겠습니까?', () => {
+    state.students = [];
+    if (state.seats && Array.isArray(state.seats)) {
+      state.seats.forEach(s => {
+        s.studentId = null;
+        s.fixedStudentId = null;
+      });
+    }
+
+    renderSeats();
+    updateStudentListPreview();
+
+    const rows = document.querySelectorAll('#student-grid-body .student-row');
+    rows.forEach(r => {
+      r.querySelectorAll('input').forEach(i => i.value = '');
+    });
+
+    toast('학생 명단 및 좌석 정보가 초기화되었습니다.');
+    if (typeof saveAutoState === 'function') saveAutoState();
   });
-  toast('학생 명단이 초기화되었습니다.');
-  if (typeof saveAutoState === 'function') saveAutoState();
 }

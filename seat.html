@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>학급 자리배치 프로그램</title>
+  <link rel="icon" type="image/x-icon" href="loopy.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;700;900&family=Poor+Story&display=swap" rel="stylesheet">
@@ -160,13 +161,15 @@
 
 <div id="toast"></div>
 
-<!-- 확인 모달 -->
-<div id="confirm-modal" class="mbg" style="display:none; z-index:800;">
-  <div class="modal">
-    <div class="modal-msg" id="confirm-msg"></div>
-    <div class="modal-btns">
-      <button class="btn-ok" onclick="confirmOk()">확인</button>
-      <button class="btn-cancel" onclick="confirmCancel()">취소</button>
+<!-- 예쁜 커스텀 확인 모달 -->
+<div id="confirm-modal" class="mbg" style="display:none; z-index:1000;">
+  <div class="modal" style="background:#ffffff; border-radius:20px; border:2.5px solid #F18BA7; box-shadow:0 12px 36px rgba(241,139,167,0.35); text-align:center; padding:26px 22px; width:min(380px, 92vw);">
+    <div style="font-size:38px; margin-bottom:8px;">🗑️</div>
+    <h3 style="font-size:17px; font-weight:900; color:#3e2410; margin-bottom:8px;">초기화 확인</h3>
+    <div class="modal-msg" id="confirm-msg" style="font-size:13.5px; color:#4b5563; margin-bottom:22px; line-height:1.55; word-break:keep-all;"></div>
+    <div class="modal-btns" style="display:flex; gap:10px;">
+      <button class="btn-cancel" onclick="closeConfirm(false)" style="flex:1; padding:11px; border-radius:10px; background:#f3f4f6; color:#4b5563; font-weight:700; border:none; cursor:pointer; font-size:13.5px; transition:background .15s;">취소</button>
+      <button class="btn-ok" onclick="closeConfirm(true)" style="flex:1; padding:11px; border-radius:10px; background:#ef4444; color:#ffffff; font-weight:900; border:none; cursor:pointer; font-size:13.5px; box-shadow:0 4px 10px rgba(239,68,68,0.3); transition:transform .1s, opacity .15s;">초기화</button>
     </div>
   </div>
 </div>

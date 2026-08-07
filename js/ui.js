@@ -141,3 +141,23 @@ export function closeStudentModal() {
   const m = document.getElementById('student-list-modal');
   if (m) m.style.display = 'none';
 }
+
+let confirmCallback = null;
+
+export function customConfirm(msg, callback) {
+  const modal = document.getElementById('confirm-modal');
+  const msgEl = document.getElementById('confirm-msg');
+  if (msgEl) msgEl.textContent = msg;
+  confirmCallback = callback;
+  if (modal) modal.style.display = 'flex';
+}
+
+export function closeConfirm(result) {
+  const modal = document.getElementById('confirm-modal');
+  if (modal) modal.style.display = 'none';
+  if (result && typeof confirmCallback === 'function') {
+    confirmCallback();
+  }
+  confirmCallback = null;
+}
+window.closeConfirm = closeConfirm;

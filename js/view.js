@@ -1,6 +1,6 @@
 import { state, cfg, LAYOUTS, saveAutoState } from './state.js';
 import { getLayoutRows, applyAlgo } from './layout.js';
-import { toast } from './ui.js';
+import { toast, customConfirm } from './ui.js';
 
 export function renderSeats() {
   const container = document.getElementById('seats-container');
@@ -400,6 +400,49 @@ export function cancelArrangement() {
   }, 2500);
 }
 
+export function playMarimbaStep(n) {
+  try {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const freqs = [523.25, 587.33, 659.25, 698.46, 783.99];
+    const idx = 5 - n;
+    const freq = freqs[Math.max(0, Math.min(idx, freqs.length - 1))];
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.42, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.25);
+  } catch (e) {}
+}
+
+export function playMarimbaFanfare() {
+  try {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const freqs = [523.25, 659.25, 783.99, 1046.50];
+    freqs.forEach((f, i) => {
+      setTimeout(() => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(f, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.36, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.4);
+      }, i * 70);
+    });
+  } catch (e) {}
+}
+
 export function startArrangeCountdown(prevState) {
   state.isArrangementCancelled = false;
   state.prevStateJson = prevState;
@@ -407,7 +450,7 @@ export function startArrangeCountdown(prevState) {
   let n = 5;
 
   setBubbleText(`<span style="font-size:15px;">공개까지 <span style="font-size:21px; font-weight:900; color:#f43f5e; margin:0 2px;">${n}</span>초 전!</span>`, true);
-  playBeep(440, 0.1, 0.13);
+  playMarimbaStep(n);
 
   // 카운트다운 실행 중 프로그램 내부 임의 클릭 시 즉시 취소 핸들러 등록
   setTimeout(() => {
@@ -431,7 +474,7 @@ export function startArrangeCountdown(prevState) {
       clearInterval(state.countdownTimer);
       state.countdownTimer = null;
       cleanupCountdownEvents();
-      playBeep(880, 0.5, 0.26);
+      playMarimbaFanfare();
       renderSeats();
       setBubbleText('<span style="font-size:15px; font-weight:800;">배치 완료! 🎉</span>');
       toast('배치가 공개되었습니다!');
@@ -439,7 +482,7 @@ export function startArrangeCountdown(prevState) {
         if (!state.countdownTimer) setBubbleText('오늘의 자리를 배치해볼까요?');
       }, 3000);
     } else {
-      playBeep(440, 0.1, 0.13);
+      playMarimbaStep(n);
       setBubbleText(`<span style="font-size:15px;">공개까지 <span style="font-size:21px; font-weight:900; color:#f43f5e; margin:0 2px;">${n}</span>초 전!</span>`, true);
     }
   }, 1000);
@@ -471,16 +514,18 @@ export function updateBadge() {
 }
 
 export function resetArrangement() {
-  // Clear student assignments and locks/exclusions
-  state.seats.forEach(s => {
-    s.student = null;
-    s.isLocked = false;
-    s.fixedFor = null;
-    s.excluded = false;
+  customConfirm('배치된 모든 자리와 고정석/제외석 설정을 초기화하시겠습니까?', () => {
+    state.seats.forEach(s => {
+      s.student = null;
+      s.isLocked = false;
+      s.fixedFor = null;
+      s.excluded = false;
+    });
+    renderSeats();
+    updateBadge();
+    toast('자리 배치가 초기화되었습니다.');
+    if (typeof saveAutoState === 'function') saveAutoState();
   });
-  renderSeats();
-  updateBadge();
-  toast('자리 배치가 초기화되었습니다.');
 }
 
 export function fitToWorkspace() {
