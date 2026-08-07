@@ -74,13 +74,14 @@
           <span class="toggle-label">교사 시점</span>
         </div>
       </div>
-      <div class="card-body" style="display:flex; flex-direction:column; gap:8px;">
-        <button class="exec-btn" style="width:100%; justify-content:center; padding:12px; font-size:15px;" onclick="executeArrangement()">자리 배치 실행</button>
+      <div class="card-body" style="display:flex; gap:8px;">
+        <button class="exec-btn" style="flex:7; justify-content:center; padding:12px; font-size:15px;" onclick="executeArrangement()">자리 배치 실행</button>
+        <button class="exec-btn" style="flex:3; justify-content:center; padding:12px; font-size:15px; background:#fff; color:var(--text1); border:1px solid var(--border2);" onclick="resetArrangement()">배치 초기화</button>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-head">자리 배치결과 <button class="badge" onclick="resetArrangement()">배치 초기화</button></div>
+      <div class="card-head">자리 배치결과</div>
       <div class="card-body">
         <div style="display:flex; gap:5px; margin-top:4px;">
           <button class="exec-btn-sm outline" style="flex:1;" onclick="printScreen()">인쇄하기</button>
