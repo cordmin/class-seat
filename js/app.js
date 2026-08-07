@@ -1,6 +1,6 @@
 ﻿import { state, cfg, INIT_ROWS, getArrangementDataForSave } from './state.js';
 import { initSeats, updateSelectLogic, onSeatCountChange, onColCountChange, onLayoutChange, onAlgoChange } from './layout.js';
-import { renderSeats, updateBadge, toggleTeacherView, executeArrangement } from './view.js';
+import { renderSeats, updateBadge, toggleTeacherView, executeArrangement, resetArrangement } from './view.js';
 import { downloadTemplate, loadStudentExcel, exportToExcel, saveAsImage, printScreen, saveFile, loadFile, onLoadFile, addStudentRow, initGrid, processLoadedData } from './io.js';
 import { toast, showConfirm, confirmOk, confirmCancel, updateStudentListPreview, openStudentModal, closeStudentModal, toggleSaveMenu, hideSaveMenu } from './ui.js';
 
@@ -26,6 +26,7 @@ window.showConfirm = showConfirm;
 window.confirmOk = confirmOk;
 window.confirmCancel = confirmCancel;
 window.executeArrangement = executeArrangement;
+window.resetArrangement = resetArrangement;
 window.addStudentRow = addStudentRow;
 window.processLoadedData = processLoadedData;
 

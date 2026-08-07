@@ -429,6 +429,19 @@ export function updateBadge() {
   }
 }
 
+export function resetArrangement() {
+  // Clear student assignments and locks/exclusions
+  state.seats.forEach(s => {
+    s.student = null;
+    s.isLocked = false;
+    s.fixedFor = null;
+    s.excluded = false;
+  });
+  renderSeats();
+  updateBadge();
+  toast('자리 배치가 초기화되었습니다.');
+}
+
 export function fitToWorkspace() {
   const workspace = document.getElementById('workspace');
   const boardArea = document.getElementById('board-area');
