@@ -199,9 +199,9 @@
 
   .lbl {
     display: block;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
-    color: var(--textm);
+    color: var(--text2);
     margin-bottom: 3px;
   }
 
@@ -276,7 +276,7 @@
     border: 1px solid var(--border2);
     box-shadow: none;
     font-weight: 700;
-    font-size: 11px;
+    font-size: 13px;
     padding: 8px 4px;
     margin-bottom: 0;
   }
@@ -741,23 +741,36 @@
   .sort-row { display: flex; gap: 4px; margin-top: 5px; }
   .sort-row .inp { font-size: 11px; padding: 5px 4px; }
 
-  /* ── 인쇄 전용 스타일 (비율/잘림 완벽 개선) ── */
+  /* ── 인쇄 전용 스타일 (A4 가로 1페이지 고정) ── */
   @media print {
-    #sidebar, #sb-resizer, #main-toolbar, #toast, #countdown-overlay, #confirm-modal, #ctx-menu, #help-modal {
+    body > *:not(#temp-print-wrap) {
       display: none !important;
     }
     
-    html, body, #main, #workspace {
+    html, body {
       background: #ffffff !important;
       width: 100% !important;
       height: 100% !important; 
       margin: 0 !important;
       padding: 0 !important;
-      overflow: visible !important;
+      overflow: hidden !important;
     }
-    
-    #board-area {
+
+    #temp-print-wrap {
+      position: absolute !important;
+      left: 0 !important;
+      top: 0 !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      margin: 0 !important;
+      padding: 5mm !important;
+      background: #ffffff !important;
+      display: flex !important;
+      flex-direction: row !important;
+      gap: 15px !important;
+      align-items: flex-start !important;
       page-break-inside: avoid !important;
+      break-inside: avoid !important;
     }
 
     * {

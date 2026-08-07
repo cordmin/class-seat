@@ -314,43 +314,66 @@ export async function printScreen() {
   if (document.getElementById('temp-print-wrap')) return;
   toast('인쇄를 준비합니다...');
 
-  const boardArea = document.getElementById('board-area');
-  const workspace = document.getElementById('workspace');
-  if (!boardArea || !workspace) return;
+  const seatsWrap = document.getElementById('seats-wrap');
+  if (!seatsWrap) return;
+
+  const originalParent = seatsWrap.parentElement;
+  const originalNextSibling = seatsWrap.nextSibling;
 
   const printWrap = document.createElement('div');
   printWrap.id = 'temp-print-wrap';
-  printWrap.style.cssText = 'padding:20px; background:#fdf8f3; width:100%; max-width:1040px; box-sizing:border-box;';
-  printWrap.style.display = 'flex';
-  printWrap.style.flexDirection = 'column';
-  printWrap.style.gap = '24px';
+  printWrap.style.cssText = 'position:absolute; left:0; top:0; width:1020px; background:#ffffff; padding:15px; box-sizing:border-box; display:flex; flex-direction:row; gap:20px; align-items:flex-start; justify-content:flex-start; z-index:99999;';
 
+  // 1. 좌측 학생 명단 표 생성 (번호 | 이름 | 성별)
   const listDiv = document.createElement('div');
-  listDiv.style.cssText = 'width:100%; padding:18px; background:#fff; border:1px solid var(--border2); border-radius:18px; box-shadow:0 12px 20px rgba(0,0,0,0.08); overflow:hidden;';
-  listDiv.innerHTML = '<h3 style="margin:0 0 12px; font-size:18px; color:var(--text1);">학생 명단</h3>';
-  listDiv.innerHTML += '<table style="width:100%; border-collapse:collapse; font-family:\'Malgun Gothic\', sans-serif;">';
-  listDiv.innerHTML += '<tr><th style="text-align:left; padding:6px 8px; border-bottom:1px solid var(--border2);">번호</th><th style="text-align:left; padding:6px 8px; border-bottom:1px solid var(--border2);">이름</th></tr>';
-  const sortedStudents = [...state.students].sort((a, b) => String(a.id||'').localeCompare(String(b.id||''), 'ko', { numeric: true }));
+  listDiv.style.cssText = 'width:210px; flex-shrink:0; box-sizing:border-box;';
+  
+  let tableHtml = `
+    <table style="width:100%; border-collapse:collapse; font-family:'Noto Sans KR', 'Malgun Gothic', sans-serif; font-size:11px; border:2px solid #000000;">
+      <thead>
+        <tr style="background:#fbbf24; color:#000000; font-size:12px; font-weight:900; -webkit-print-color-adjust:exact; print-color-adjust:exact;">
+          <th style="border:1px solid #000000; padding:4px 2px; width:45px; text-align:center;">번호</th>
+          <th style="border:1px solid #000000; padding:4px 2px; text-align:center;">이 름</th>
+          <th style="border:1px solid #000000; padding:4px 2px; width:45px; text-align:center;">성별</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  const sortedStudents = [...state.students].sort((a, b) => 
+    String(a.id || '').localeCompare(String(b.id || ''), 'ko', { numeric: true })
+  );
+
   sortedStudents.forEach(st => {
-    listDiv.innerHTML += `<tr><td style="border: 1px solid var(--border2); padding: 2px 4px; color:var(--text1); font-weight:700;">${st.id}</td><td style="border: 1px solid var(--border2); padding: 2px 4px; color:var(--text1);">${st.name}</td></tr>`;
+    tableHtml += `
+      <tr style="background:#ffffff;">
+        <td style="border:1px solid #000000; padding:3px 2px; text-align:center; font-weight:700; color:#000000;">${st.id || ''}</td>
+        <td style="border:1px solid #000000; padding:3px 4px; text-align:center; font-weight:700; color:#000000;">${st.name || ''}</td>
+        <td style="border:1px solid #000000; padding:3px 2px; text-align:center; color:#000000;">${st.gender || ''}</td>
+      </tr>
+    `;
   });
-  listDiv.innerHTML += '</table>';
+  tableHtml += '</tbody></table>';
+  listDiv.innerHTML = tableHtml;
 
-  workspace.insertBefore(printWrap, boardArea);
+  // 2. 우측 분단 배치 영역
+  const rightWrap = document.createElement('div');
+  rightWrap.style.cssText = 'flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; box-sizing:border-box; overflow:hidden;';
+
   printWrap.appendChild(listDiv);
-  printWrap.appendChild(boardArea);
+  rightWrap.appendChild(seatsWrap);
+  printWrap.appendChild(rightWrap);
+  document.body.appendChild(printWrap);
 
-  const w = printWrap.scrollWidth;
-  const h = printWrap.scrollHeight;
-  const targetW = 1040;
-  const targetH = 730;
-  let scale = Math.min(targetW / w, targetH / h, 1);
-  printWrap.style.transform = `scale(${scale})`;
-  printWrap.style.height = `${h * scale}px`;
-  printWrap.style.overflow = 'hidden';
-  printWrap.style.pageBreakInside = 'avoid';
-
-  setTimeout(() => { window.print(); workspace.appendChild(boardArea); printWrap.remove(); }, 300);
+  setTimeout(() => {
+    window.print();
+    if (originalNextSibling) {
+      originalParent.insertBefore(seatsWrap, originalNextSibling);
+    } else {
+      originalParent.appendChild(seatsWrap);
+    }
+    printWrap.remove();
+  }, 300);
 }
 
 export async function saveFile() {
