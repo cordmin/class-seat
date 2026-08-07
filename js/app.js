@@ -1455,7 +1455,7 @@ function showHelp() { document.getElementById('help-modal').style.display = 'fle
       const isTeacherMode = document.getElementById('board-area').classList.contains('teacher-mode');
       
       const fixedW = 60; 
-      const fixedH = isTeacherMode ? 350 : 300; 
+      const fixedH = isTeacherMode ? 300 : 250; 
       
       let scalableAvailW = workspace.clientWidth - fixedW;
       let scalableAvailH = workspace.clientHeight - fixedH;
