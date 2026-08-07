@@ -52,6 +52,7 @@
   #sidebar {
     width: var(--sb-width);
     min-width: var(--sb-width);
+    max-width: var(--sb-width);
     background: var(--sidebar);
     display: flex;
     flex-direction: column;
@@ -722,10 +723,11 @@
   ::-webkit-scrollbar-thumb { background: #c1c9d6; border-radius: 3px; }
 
   #sb-resizer {
-    width: 5px;
-    cursor: col-resize;
+    display: none;
+    width: 0;
+    cursor: default;
     background: transparent;
-    transition: background .15s;
+    transition: none;
     flex-shrink: 0;
     align-self: stretch;
   }
