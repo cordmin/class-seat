@@ -484,7 +484,7 @@
   /* 교사 시점 활성화 시 Flex Order 순서 변경 */
   /* Match the blackboard top/bottom spacing to workspace top padding (32px) for consistent visual balance */
   #board-area.teacher-mode .blackboard { order: 3; margin-top: 32px; }
-  #board-area.teacher-mode .board-spacer { order: 4; margin-bottom: 32px; }
+  #board-area.teacher-mode .board-spacer { order: 4; margin-bottom: 20px; }
   #board-area.teacher-mode #seats-wrap { order: 1; }
 
   .cols-container {
