@@ -28,23 +28,23 @@ export const INIT_ROWS = 10;
 
 export const ALGO_OPTIONS = {
   single: [
-    { val: 'idAsc', text: '번호 순서' },
     { val: 'random', text: '무작위' },
+    { val: 'idAsc', text: '번호 순서' },
     { val: 'genderMixRow', text: '남녀 줄별 교차' },
     { val: 'genderMixCluster', text: '남녀 분단 교차' },
     { val: 'genderSeparate', text: '남녀 최대 분리' }
   ],
   pair: [
-    { val: 'idAsc', text: '번호 순서' },
     { val: 'random', text: '무작위' },
+    { val: 'idAsc', text: '번호 순서' },
     { val: 'genderPair', text: '남녀 짝궁' },
     { val: 'genderMixCluster', text: '남녀 분단 교차' },
     { val: 'genderMixRow', text: '남녀 줄별 교차' },
     { val: 'genderSeparate', text: '남녀 최대 분리' }
   ],
   group: [
-    { val: 'idAsc', text: '번호 순서' },
     { val: 'random', text: '무작위' },
+    { val: 'idAsc', text: '번호 순서' },
     { val: 'genderMixRow', text: '남녀 줄별 교차' },
     { val: 'genderMixCluster', text: '남녀 분단 교차' },
     { val: 'genderSeparate', text: '남녀 최대 분리' },
@@ -52,8 +52,8 @@ export const ALGO_OPTIONS = {
     { val: 'genderSameGroup', text: '동성 짝궁' }
   ],
   group6: [
-    { val: 'idAsc', text: '번호 순서' },
     { val: 'random', text: '무작위' },
+    { val: 'idAsc', text: '번호 순서' },
     { val: 'genderMixRow', text: '남녀 줄별 교차' },
     { val: 'genderMixCluster', text: '남녀 분단 교차' },
     { val: 'genderSeparate', text: '남녀 최대 분리' },
