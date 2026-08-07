@@ -69,9 +69,10 @@
           <label for="countdown-opt" style="cursor:pointer; color:var(--text1); font-size:12px; font-weight:700; margin-left:6px;">5초 카운트다운</label>
         </div>
 
-        <div style="display:flex; gap:6px; margin-top:4px;">
-          <button class="exec-btn-sm" style="flex:1; background:#fff; color:var(--text1); border:1px solid var(--border2); justify-content:center;" onclick="printScreen()">🖨️ 출력</button>
-          <button class="exec-btn-sm" id="btn-save-pop" style="flex:1; background:var(--sidebar2); color:var(--text1); border:1px solid var(--border2); justify-content:center; position:relative;" onclick="toggleSaveMenu(event)">💾 저장</button>
+        <div style="display:flex; gap:5px; margin-top:4px;">
+          <button class="exec-btn-sm" id="teacher-view-btn" style="flex:1; background:#fff; color:var(--text1); border:1px solid var(--border2); justify-content:center; padding:6px 2px; font-size:11px;" onclick="toggleTeacherView()">🔃 교사 시점</button>
+          <button class="exec-btn-sm" style="flex:1; background:#fff; color:var(--text1); border:1px solid var(--border2); justify-content:center; padding:6px 2px; font-size:11px;" onclick="printScreen()">🖨️ 출력</button>
+          <button class="exec-btn-sm" id="btn-save-pop" style="flex:1; background:var(--sidebar2); color:var(--text1); border:1px solid var(--border2); justify-content:center; position:relative; padding:6px 2px; font-size:11px;" onclick="toggleSaveMenu(event)">💾 저장</button>
         </div>
       </div>
     </div>
@@ -82,10 +83,6 @@
 <div id="sb-resizer"></div>
 
 <div id="main">
-  <div id="main-toolbar">
-    <div class="spacer"></div>
-    <button class="toolbar-btn" id="teacher-view-btn" onclick="toggleTeacherView()">🔃 교사 시점</button>
-  </div>
 
   <div id="countdown-overlay">
     <div id="countdown-num"></div>
