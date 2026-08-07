@@ -83,7 +83,59 @@ class Api:
         try:
             with open(save_path, 'w', encoding='utf-8') as f:
                 f.write(content)
+        except Exception as e:
+            return {'ok': False, 'error': str(e)}
+
+    def download_template(self):
+        import shutil
+        result = webview.windows[0].create_file_dialog(
+            webview.SAVE_DIALOG,
+            directory=os.path.expanduser('~\\Desktop'),
+            save_filename='자리배치명단(양식).xlsx',
+            file_types=('Excel File (*.xlsx)', 'All files (*.*)')
+        )
+        if not result:
+            return {'ok': False}
+        save_path = result if isinstance(result, str) else result[0]
+        try:
+            template_path = resource_path('자리배치명단(양식).xlsx')
+            shutil.copy(template_path, save_path)
             return {'ok': True, 'path': save_path}
+        except Exception as e:
+            return {'ok': False, 'error': str(e)}
+
+    def load_excel(self):
+        import openpyxl
+        result = webview.windows[0].create_file_dialog(
+            webview.OPEN_DIALOG,
+            directory=os.path.expanduser('~\\Desktop'),
+            file_types=('Excel File (*.xlsx)', 'All files (*.*)')
+        )
+        if not result:
+            return {'ok': False}
+        file_path = result if isinstance(result, str) else result[0]
+        try:
+            wb = openpyxl.load_workbook(file_path, data_only=True)
+            ws = wb.active
+            students = []
+            for row in ws.iter_rows(min_row=2, values_only=True):
+                if not row or (row[0] is None and row[1] is None):
+                    continue
+                num = str(row[0]).strip() if row[0] is not None else ""
+                name = str(row[1]).strip() if len(row) > 1 and row[1] is not None else ""
+                gender = str(row[2]).strip() if len(row) > 2 and row[2] is not None else ""
+                
+                if gender.startswith('남') or gender.upper() == 'M': gender = '남'
+                elif gender.startswith('여') or gender.upper() == 'F': gender = '여'
+                else: gender = ''
+                
+                if name:
+                    students.append({
+                        'id': num,
+                        'name': name,
+                        'gender': gender
+                    })
+            return {'ok': True, 'students': students}
         except Exception as e:
             return {'ok': False, 'error': str(e)}
 
