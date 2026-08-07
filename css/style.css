@@ -530,7 +530,7 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all .15s;
+    transition: background .15s, border-color .15s, box-shadow .15s, transform .15s;
     position: relative;
     overflow: hidden;
   }
