@@ -356,7 +356,7 @@ export async function printScreen() {
   // 2. 우측 분단 배치 영역
   const isTeacher = state.teacherView;
   const rightWrap = document.createElement('div');
-  rightWrap.style.cssText = 'flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; box-sizing:border-box; overflow:hidden; gap:12px;';
+  rightWrap.style.cssText = 'flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; box-sizing:border-box; gap:12px;';
 
   const bbEl = document.createElement('div');
   bbEl.style.cssText = 'width:70%; max-width:380px; padding:12px 5px; background:#2e4a38; color:#ffffff; font-weight:900; text-align:center; border-radius:6px; font-size:14px; letter-spacing:4px; -webkit-print-color-adjust:exact; print-color-adjust:exact;';
@@ -382,8 +382,8 @@ export async function printScreen() {
   document.body.appendChild(printWrap);
 
   // A4 가로 1페이지 완벽 중앙 정렬 및 자동 스케일링
-  const targetW = 980;
-  const targetH = 640;
+  const targetW = 880;
+  const targetH = 600;
   const w = printWrap.scrollWidth || 1020;
   const h = printWrap.scrollHeight || 700;
   const scale = Math.min(targetW / w, targetH / h, 1);
