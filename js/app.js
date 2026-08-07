@@ -355,7 +355,7 @@ function onSeatClick(id, e) {
       const src = seats.find(s => s.id === selectedSeatId);
       if (src && !src.isGhost) {
         if (src.isLocked || seat.isLocked) {
-           toast('🔒 잠긴 자리는 교환할 수 없습니다.', true);
+           toast('잠긴 자리는 교환할 수 없습니다.', true);
            selectedSeatId = null;
            renderSeats();
            return;
@@ -391,7 +391,7 @@ function onDragStart(id, e) {
   const seat = seats.find(s => s.id === id);
   if (!seat || seat.isGhost || seat.isLocked) {
       e.preventDefault();
-      if(seat && seat.isLocked) toast('🔒 잠긴 자리는 이동할 수 없습니다.', true);
+      if(seat && seat.isLocked) toast('잠긴 자리는 이동할 수 없습니다.', true);
       return;
   }
   dragSrcId = id;
@@ -424,7 +424,7 @@ function onDrop(id, e) {
   if (!src || !dst) { renderSeats(); return; }
 
   if (src.isLocked || dst.isLocked) {
-     toast('🔒 잠긴 자리는 교환할 수 없습니다.', true);
+     toast('잠긴 자리는 교환할 수 없습니다.', true);
      renderSeats();
      return;
   }
@@ -448,7 +448,7 @@ function openContextMenu(x, y, seat) {
   if (seat.fixedFor) {
     const btn = document.createElement('div');
     btn.className = 'ctx-item danger';
-    btn.textContent = '🔓 고정 해제';
+    btn.textContent = '고정 해제';
     btn.onclick = () => { seat.fixedFor = null; seat.isLocked = false; closeCtx(); renderSeats(); };
     itemsEl.appendChild(btn);
     itemsEl.appendChild(Object.assign(document.createElement('div'), { className: 'ctx-sep' }));
@@ -516,7 +516,7 @@ function executeArrangement() {
     startArrangeCountdown(previousSeatsState);
   } else {
     renderSeats();
-    toast('배치가 완료되었습니다! ✨');
+    toast('배치가 완료되었습니다!');
   }
 }
 
@@ -567,7 +567,7 @@ function startArrangeCountdown(prevState) {
       overlay.removeEventListener('click', clickHandler);
       playBeep(880, 0.5, 0.2); 
       overlay.style.display = 'none';
-      toast('배치가 공개되었습니다! ✨');
+      toast('배치가 공개되었습니다!');
     } else {
       playBeep(440, 0.1, 0.1); 
       numEl.textContent = n;
@@ -575,7 +575,7 @@ function startArrangeCountdown(prevState) {
   }, 1000);
 }
 
-// ─── ✨ 핵심 로직: 전체 좌석의 잠금 상태를 파악하여 성별 강제 ───────────────────────────
+// ─── 핵심 로직: 전체 좌석의 잠금 상태를 파악하여 성별 강제 ───────────────────────────
 function applyAlgo(studentList, algo, freeSeats) {
   const s = [...studentList];
   
@@ -608,7 +608,7 @@ function applyAlgo(studentList, algo, freeSeats) {
   });
   let blocks = Array.from(blocksMap.values());
 
-  // ⭐ [추가된 부분] 전체 좌석(글로벌 변수 seats)을 훑어서 이미 잠긴 자리의 성별을 파악!
+  // [추가된 부분] 전체 좌석(글로벌 변수 seats)을 훑어서 이미 잠긴 자리의 성별을 파악!
   let lockedConstraints = new Map();
   seats.filter(s => s.fixedFor && !s.isGhost && !s.excluded && s.student).forEach(s => {
      let key = s.colIdx + '-' + s.groupIdx;
@@ -623,7 +623,7 @@ function applyAlgo(studentList, algo, freeSeats) {
       blockObj.idxs.forEach(idx => {
         let seat = freeSeats[idx];
         
-        // ⭐ 핵심: 짝꿍 자리 중 왼쪽(짝수 인덱스)은 '남', 오른쪽(홀수 인덱스)은 '여'로 강제 지정
+        // 핵심: 짝꿍 자리 중 왼쪽(짝수 인덱스)은 '남', 오른쪽(홀수 인덱스)은 '여'로 강제 지정
         let p = (seat.orderIdx % 2 === 0) ? '남' : '여';
 
         // 단, 선생님께서 특정 자리에 미리 자물쇠를 채워두셨다면?
@@ -657,7 +657,7 @@ function applyAlgo(studentList, algo, freeSeats) {
         pref = (blockNumber % 2 === 0) ? (startMale ? '남' : '여') : (startMale ? '여' : '남');
       }
 
-      // ⭐ 잠긴 자리가 있다면 해당 자리의 성별로 덮어쓰기! (이게 핵심)
+      // 잠긴 자리가 있다면 해당 자리의 성별로 덮어쓰기! (이게 핵심)
       if (lockedConstraints.has(blockObj.key)) {
           pref = lockedConstraints.get(blockObj.key);
       } else {
@@ -685,7 +685,7 @@ function applyAlgo(studentList, algo, freeSeats) {
     blocks.forEach(blockObj => {
       let targetPref = mainPref;
 
-      // ⭐ 여기도 잠긴 자리가 있다면 해당 짝꿍은 잠긴 자리와 동일한 성별로 강제!
+      // 여기도 잠긴 자리가 있다면 해당 짝꿍은 잠긴 자리와 동일한 성별로 강제!
       if (lockedConstraints.has(blockObj.key)) {
           targetPref = lockedConstraints.get(blockObj.key);
       } else {
@@ -974,7 +974,7 @@ async function saveFile() {
   if (window.pywebview && window.pywebview.api && window.pywebview.api.save_data_file) {
     const result = await window.pywebview.api.save_data_file(filename, jsonStr);
     if (result.ok) {
-      toast(`저장 완료 💾`);
+      toast(`저장 완료`);
     } else if (result.error) {
       toast('저장 취소 또는 실패: ' + result.error, true);
     }
@@ -984,7 +984,7 @@ async function saveFile() {
     a.href = URL.createObjectURL(blob);
     a.download = filename;
     a.click();
-    toast('파일이 저장되었습니다. 💾');
+    toast('파일이 저장되었습니다.');
   }
 }
 
@@ -1111,7 +1111,7 @@ async function exportToExcel() {
   const extraCols = cfg.colGap > 0 ? (cols.length - 1) : 0;
   const totalColumns = colWidths.reduce((a,b) => a+b, 0) + extraCols;
 
-  const boardText = teacherView ? '📋 칠판 — 교사 시점' : '📋 칠판';
+  const boardText = teacherView ? '칠판 — 교사 시점' : '칠판';
   
   tableHtml += `<tr><th colspan="${totalColumns}" style="background-color:#2d4a2e; color:#a7f3c4; height:50px; font-size:16px;">${boardText}</th></tr>`;
   tableHtml += `<tr><td colspan="${totalColumns}" style="height:20px; border:none;"></td></tr>`; 
@@ -1210,7 +1210,7 @@ async function exportToExcel() {
   <div id="student-list-modal" class="mbg" style="display:none; z-index:900;">
     <div class="modal" style="width: min(400px, 92vw); max-height:80vh; display:flex; flex-direction:column; padding:0; overflow:hidden; border-radius:16px;">
       <div style="padding:16px 20px; background:var(--accent); color:#fff; display:flex; justify-content:space-between; align-items:center;">
-        <h3 style="margin:0; font-size:16px; color:#fff; font-weight:800;">👀 현재 적용된 학생 명단</h3>
+        <h3 style="margin:0; font-size:16px; color:#fff; font-weight:800;"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> 현재 적용된 학생 명단</h3>
         <button onclick="closeStudentModal()" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer; line-height:1;">&times;</button>
       </div>
       <div id="modal-student-list-content" style="padding:16px; overflow-y:auto; flex:1; background:var(--bg);">
@@ -1230,7 +1230,7 @@ async function exportToExcel() {
   if (window.pywebview && window.pywebview.api && window.pywebview.api.save_excel_file) {
     const result = await window.pywebview.api.save_excel_file(filename, htmlContent);
     if (result.ok) {
-      toast(`엑셀 저장 완료 📊`);
+      toast(`엑셀 저장 완료`);
     } else if (result.error) {
       toast('저장 취소 또는 실패: ' + result.error, true);
     }
@@ -1240,7 +1240,7 @@ async function exportToExcel() {
     a.href = URL.createObjectURL(blob);
     a.download = filename;
     a.click();
-    toast('엑셀 파일이 저장되었습니다! 📊');
+    toast('엑셀 파일이 저장되었습니다!');
   }
 }
 
@@ -1277,7 +1277,7 @@ async function saveAsImage() {
     if (window.pywebview && window.pywebview.api && window.pywebview.api.save_file) {
       const result = await window.pywebview.api.save_file(filename, dataUrl);
       if (result.ok) {
-        toast(`저장 완료 📷 `);
+        toast(`저장 완료`);
       } else if (result.error) {
         toast('저장 취소 또는 실패: ' + result.error, true);
       }
@@ -1286,7 +1286,7 @@ async function saveAsImage() {
       link.download = filename;
       link.href = dataUrl;
       link.click();
-      toast('이미지가 저장되었습니다! 📷');
+      toast('이미지가 저장되었습니다!');
     }
   } catch(err) {
     toast('이미지 생성 실패: ' + err.message, true);
@@ -1345,16 +1345,16 @@ function toggleTeacherView() {
     btn.style.color = '#1d4ed8';
     btn.style.borderColor = '#93c5fd';
     btn.title = '학생 시점으로 되돌리기';
-    btn.innerHTML = '🔃 학생 시점';
-    blackboard.innerHTML = '📋 칠판 <span style="font-size:11px;color:#a7f3c4;font-weight:400;">— 교사 시점</span>';
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg> 학생 시점';
+    blackboard.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg> 칠판 <span style="font-size:11px;color:#a7f3c4;font-weight:400;">— 교사 시점</span>';
     boardArea.classList.add('teacher-mode');
   } else {
     btn.style.background = '';
     btn.style.color = '';
     btn.style.borderColor = '';
     btn.title = '교사 시점으로 화면 전환';
-    btn.innerHTML = '🔃 교사 시점';
-    blackboard.textContent = '📋 칠판';
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg> 교사 시점';
+    blackboard.textContent = '칠판';
     boardArea.classList.remove('teacher-mode');
   }
   renderSeats(); 
@@ -1413,8 +1413,8 @@ function toggleTeacherView() {
     
     const listHtml = students.map(s => {
       let genderBadge = '';
-      if (s.gender === '남') genderBadge = `<span style="background:#dbeafe; color:#1e40af; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:800; display:inline-flex; align-items:center; gap:3px;">👦 남</span>`;
-      else if (s.gender === '여') genderBadge = `<span style="background:#fce7f3; color:#9d174d; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:800; display:inline-flex; align-items:center; gap:3px;">👧 여</span>`;
+      if (s.gender === '남') genderBadge = `<span style="background:#dbeafe; color:#1e40af; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:800; display:inline-flex; align-items:center; gap:3px;">♂ 남</span>`;
+      else if (s.gender === '여') genderBadge = `<span style="background:#fce7f3; color:#9d174d; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:800; display:inline-flex; align-items:center; gap:3px;">♀ 여</span>`;
       
       return `<div style="display:flex; align-items:center; gap:12px; padding:10px 14px; border-bottom:1px solid var(--border2); background:#fff; border-radius:10px; margin-bottom:6px; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
         <div style="background:var(--accent); color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:900; flex-shrink:0;">${s.id}</div>
