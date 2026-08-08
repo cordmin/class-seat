@@ -579,14 +579,14 @@ export function fitToWorkspace() {
     const actualUnscaledH = Math.max(boardArea.scrollHeight, boardRect.height) + 24;
 
     const availW = workspace.clientWidth - 24;
-    const availH = workspace.clientHeight - 24;
+    const availH = workspace.clientHeight - 48;
 
     if (availW <= 0 || availH <= 0) return;
 
     // 2. 가로/세로 비율 중 더 작은 스케일 선택
     const scaleX = availW / actualUnscaledW;
     const scaleY = availH / actualUnscaledH;
-    let scale = Math.min(scaleX, scaleY) * 0.96; // 4% 안전 여백
+    let scale = Math.min(scaleX, scaleY) * 0.92; // 하단 넉넉한 여백용 8% 안전 축소
 
     if (scale > 1.6) scale = 1.6;
     if (scale < 0.12) scale = 0.12;
