@@ -583,22 +583,12 @@ export function fitToWorkspace() {
 
     if (availW <= 0 || availH <= 0) return;
 
-    // 2. 가로/세로 비율 중 더 작게 조절되어야 하는 스케일 선택
+    // 2. 가로/세로 비율 중 더 작은 스케일 선택
     const scaleX = availW / actualUnscaledW;
     const scaleY = availH / actualUnscaledH;
-    let scale = Math.min(scaleX, scaleY);
+    let scale = Math.min(scaleX, scaleY) * 0.92; // 하단 넉넉한 여백용 8% 안전 축소
 
-    // 3. 디바이스 환경별 스케일 최적화 (데스크톱 PC vs 태블릿)
-    const isDesktop = availW > 880 && availH > 600;
-
-    if (isDesktop) {
-      // 대형 PC 모니터 화면: 시원하고 커다랗게 꽉 차도록 1.05배 확대 및 최대 캡 2.4로 확장
-      scale = Math.min(scale * 1.05, 2.4);
-    } else {
-      // 태블릿/모바일 화면: 하단 잘림 방지 8% 안전 여백 적용
-      scale = Math.min(scale * 0.92, 1.5);
-    }
-
+    if (scale > 1.6) scale = 1.6;
     if (scale < 0.12) scale = 0.12;
 
     const cellW = Math.max(26, Math.floor(baseCellW * scale));
