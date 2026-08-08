@@ -11,8 +11,17 @@
   <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
   <link rel="stylesheet" href="css/style.css">
   <style>
+    html, body {
+      height: auto !important;
+      min-height: 100% !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      display: block !important;
+      user-select: text !important;
+      -webkit-user-select: text !important;
+    }
     body { font-family: 'Noto Sans KR', sans-serif; padding: 40px 20px; background: var(--bg); color: var(--text1); line-height: 1.6; }
-    .privacy-container { max-width: 800px; margin: 0 auto; background: #ffffff; padding: 32px; border-radius: 16px; border: 2px solid var(--border); box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+    .privacy-container { max-width: 800px; margin: 0 auto 40px auto; background: #ffffff; padding: 32px; border-radius: 16px; border: 2px solid var(--border); box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
     h1 { font-size: 22px; font-weight: 900; color: #3e2410; margin-bottom: 20px; border-bottom: 2px solid var(--border2); padding-bottom: 12px; }
     h2 { font-size: 15px; font-weight: 800; color: #59361e; margin-top: 24px; margin-bottom: 8px; }
     p, li { font-size: 13.5px; color: #4b5563; }
