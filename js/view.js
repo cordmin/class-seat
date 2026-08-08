@@ -555,7 +555,8 @@ export function resetArrangement() {
 export function fitToWorkspace() {
   const workspace = document.getElementById('workspace');
   const boardArea = document.getElementById('board-area');
-  if (!workspace || !boardArea) return;
+  const seatsWrap = document.getElementById('seats-wrap');
+  if (!workspace || !boardArea || !seatsWrap) return;
 
   try {
     boardArea.style.zoom = '1';
@@ -565,55 +566,49 @@ export function fitToWorkspace() {
     const baseCellH = 75;
     const baseColGap = 55;
     const baseRowGap = 15;
-
-    const cols = cfg.colCount || 1;
-    const maxRows = state.seats.length > 0 ? Math.max(...state.seats.map(s => s.rowIdx + 1)) : 6;
     const isTeacherMode = boardArea.classList.contains('teacher-mode');
-    const fixedW = 20;
-    const fixedH = isTeacherMode ? 260 : 210;
 
-    let scalableAvailW = workspace.clientWidth - fixedW;
-    let scalableAvailH = workspace.clientHeight - fixedH;
-    if (scalableAvailW <= 0 || scalableAvailH <= 0) return;
+    // 1. 베이스 측정값을 임시 적용하여 실제 DOM의 언스케일 폭/높이를 측정
+    document.documentElement.style.setProperty('--cell-w', `${baseCellW}px`);
+    document.documentElement.style.setProperty('--cell-h', `${baseCellH}px`);
+    document.documentElement.style.setProperty('--col-gap', `${baseColGap}px`);
+    document.documentElement.style.setProperty('--row-gap', `${baseRowGap}px`);
 
-    const layoutCols = (LAYOUTS[cfg.layoutType] || LAYOUTS.single).cols;
-    const baseTotalW = (baseCellW * cols * layoutCols) + (2 * (layoutCols - 1) * cols) + (baseColGap * (cols - 1));
-    const baseTotalH = (baseCellH * maxRows) + (baseRowGap * (maxRows - 1));
+    const actualUnscaledW = Math.max(boardArea.scrollWidth, seatsWrap.offsetWidth, 400) + 30;
+    const actualUnscaledH = boardArea.scrollHeight + (isTeacherMode ? 50 : 30);
 
-    const scaleX = scalableAvailW / baseTotalW;
-    const scaleY = scalableAvailH / baseTotalH;
+    const availW = workspace.clientWidth - 20;
+    const availH = workspace.clientHeight - 20;
+
+    if (availW <= 0 || availH <= 0) return;
+
+    // 2. 가로/세로 비율 중 더 작은 스케일 선택
+    const scaleX = availW / actualUnscaledW;
+    const scaleY = availH / actualUnscaledH;
     let scale = Math.min(scaleX, scaleY);
 
     if (isTeacherMode) {
-      scale *= 1.08;
+      scale *= 1.04;
     }
 
-    if (scale > 1.8) scale = 1.8;
-    if (scale < 0.15) scale = 0.15;
+    if (scale > 1.6) scale = 1.6;
+    if (scale < 0.12) scale = 0.12;
 
-    const cellW = Math.max(30, baseCellW * scale);
-    const cellH = Math.max(22, baseCellH * scale);
-    const colGap = Math.max(4, baseColGap * scale);
-    const rowGap = Math.max(2, baseRowGap * scale);
+    const cellW = Math.max(28, Math.floor(baseCellW * scale));
+    const cellH = Math.max(20, Math.floor(baseCellH * scale));
+    const colGap = Math.max(3, Math.floor(baseColGap * scale));
+    const rowGap = Math.max(2, Math.floor(baseRowGap * scale));
 
     document.documentElement.style.setProperty('--cell-w', `${cellW}px`);
     document.documentElement.style.setProperty('--cell-h', `${cellH}px`);
     document.documentElement.style.setProperty('--col-gap', `${colGap}px`);
     document.documentElement.style.setProperty('--row-gap', `${rowGap}px`);
-    document.documentElement.style.setProperty('--name-size', `${Math.max(9, 15 * scale + 3)}px`);
-    document.documentElement.style.setProperty('--id-size', `${Math.max(7, 11 * scale + 3)}px`);
+    document.documentElement.style.setProperty('--name-size', `${Math.max(9, Math.floor(15 * scale + 2))}px`);
+    document.documentElement.style.setProperty('--id-size', `${Math.max(7, Math.floor(11 * scale + 2))}px`);
 
     const container = document.getElementById('seats-container');
     if (container) container.style.gap = `${colGap}px`;
     document.querySelectorAll('.col-group').forEach(c => c.style.gap = `${rowGap}px`);
-
-    // 태블릿/모바일 화면 완벽 대응: 실제 렌더링 폭이 workspace보다 크면 추가 CSS Scale 축소 적용
-    const currentBoardW = boardArea.scrollWidth;
-    if (currentBoardW > workspace.clientWidth - 10) {
-      const extraScale = (workspace.clientWidth - 10) / currentBoardW;
-      boardArea.style.transform = `scale(${Math.max(0.35, extraScale)})`;
-      boardArea.style.transformOrigin = 'top center';
-    }
   } catch (e) {
     console.error(e);
   }
