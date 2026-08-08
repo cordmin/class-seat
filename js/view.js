@@ -569,8 +569,8 @@ export function fitToWorkspace() {
     const cols = cfg.colCount || 1;
     const maxRows = state.seats.length > 0 ? Math.max(...state.seats.map(s => s.rowIdx + 1)) : 6;
     const isTeacherMode = boardArea.classList.contains('teacher-mode');
-    const fixedW = 60;
-    const fixedH = isTeacherMode ? 320 : 270;
+    const fixedW = 20;
+    const fixedH = isTeacherMode ? 260 : 210;
 
     let scalableAvailW = workspace.clientWidth - fixedW;
     let scalableAvailH = workspace.clientHeight - fixedH;
@@ -584,30 +584,36 @@ export function fitToWorkspace() {
     const scaleY = scalableAvailH / baseTotalH;
     let scale = Math.min(scaleX, scaleY);
 
-    // Slightly enlarge the whole seating layout in teacher mode so the board
-    // doesn't visually collide with the seat area and spacing appears balanced.
     if (isTeacherMode) {
-      scale *= 1.12; // 12% larger in teacher view
+      scale *= 1.08;
     }
 
     if (scale > 1.8) scale = 1.8;
-    if (scale < 0.25) scale = 0.25;
+    if (scale < 0.15) scale = 0.15;
 
-    const cellW = baseCellW * scale;
-    const cellH = baseCellH * scale;
-    const colGap = Math.max(6, baseColGap * scale);
-    const rowGap = Math.max(4, baseRowGap * scale);
+    const cellW = Math.max(30, baseCellW * scale);
+    const cellH = Math.max(22, baseCellH * scale);
+    const colGap = Math.max(4, baseColGap * scale);
+    const rowGap = Math.max(2, baseRowGap * scale);
 
     document.documentElement.style.setProperty('--cell-w', `${cellW}px`);
     document.documentElement.style.setProperty('--cell-h', `${cellH}px`);
     document.documentElement.style.setProperty('--col-gap', `${colGap}px`);
     document.documentElement.style.setProperty('--row-gap', `${rowGap}px`);
-    document.documentElement.style.setProperty('--name-size', `${Math.max(10, 15 * scale + 3)}px`);
-    document.documentElement.style.setProperty('--id-size', `${Math.max(8, 11 * scale + 3)}px`);
+    document.documentElement.style.setProperty('--name-size', `${Math.max(9, 15 * scale + 3)}px`);
+    document.documentElement.style.setProperty('--id-size', `${Math.max(7, 11 * scale + 3)}px`);
 
     const container = document.getElementById('seats-container');
     if (container) container.style.gap = `${colGap}px`;
     document.querySelectorAll('.col-group').forEach(c => c.style.gap = `${rowGap}px`);
+
+    // 태블릿/모바일 화면 완벽 대응: 실제 렌더링 폭이 workspace보다 크면 추가 CSS Scale 축소 적용
+    const currentBoardW = boardArea.scrollWidth;
+    if (currentBoardW > workspace.clientWidth - 10) {
+      const extraScale = (workspace.clientWidth - 10) / currentBoardW;
+      boardArea.style.transform = `scale(${Math.max(0.35, extraScale)})`;
+      boardArea.style.transformOrigin = 'top center';
+    }
   } catch (e) {
     console.error(e);
   }
@@ -635,3 +641,9 @@ window.addEventListener('keydown', (e) => {
 });
 
 window.addEventListener('resize', fitToWorkspace);
+window.addEventListener('orientationchange', () => setTimeout(fitToWorkspace, 250));
+window.addEventListener('load', fitToWorkspace);
+document.addEventListener('DOMContentLoaded', fitToWorkspace);
+setTimeout(fitToWorkspace, 100);
+setTimeout(fitToWorkspace, 300);
+setTimeout(fitToWorkspace, 800);
