@@ -1,0 +1,16 @@
+{
+  "app": {
+    "name": "학급자리배치프로그램",
+    "url": "https://cordmin.github.io/class-seat/",
+    "stack": "static"
+  },
+  "tracks": [
+    "security",
+    "edzip"
+  ],
+  "edzipCase": "C",
+  "teacher": {
+    "dormsHandle": "Tachyon"
+  },
+  "ownershipConfirmed": true
+}

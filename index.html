@@ -3,6 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <title>학급 자리배치 프로그램</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="선생님을 위한 편리하고 예쁜 학급 자리배치 웹 프로그램">
+  <meta property="og:title" content="학급 자리배치 프로그램">
+  <meta property="og:description" content="선생님을 위한 편리하고 예쁜 학급 자리배치 웹 프로그램">
+  <meta property="og:image" content="https://cordmin.github.io/class-seat/loopy.png">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com data: blob:; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <link rel="icon" type="image/x-icon" href="loopy.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -135,11 +143,12 @@
       </div>
     </div>
 
-    <!-- 사이드바 하단 제작자 문구 -->
-    <div style="margin-top:37px; margin-bottom:4px; text-align:center;">
+    <!-- 사이드바 하단 제작자 문구 및 개인정보처리방침 -->
+    <div style="margin-top:37px; margin-bottom:4px; text-align:center; display:flex; flex-direction:column; gap:4px;">
       <a href="https://dorms.school" target="_blank" onclick="if(window.pywebview){event.preventDefault(); window.pywebview.api.open_url('https://dorms.school');}" style="font-size:11px; font-weight:800; color:#ffffff; text-decoration:none; display:inline-block; letter-spacing:0.02em; cursor:pointer; transition:opacity 0.2s;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';">
         by Dorms member Tachyon
       </a>
+      <a href="privacy.html" target="_blank" style="font-size:10.5px; font-weight:700; color:rgba(255,255,255,0.85); text-decoration:underline; cursor:pointer;">개인정보처리방침</a>
     </div>
 
   </div>
