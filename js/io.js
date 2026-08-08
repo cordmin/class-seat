@@ -70,42 +70,107 @@ export function addStudentRow() {
   body.appendChild(buildGridRow());
 }
 
+function applyLoadedStudents(students) {
+  state.students = students;
+  updateStudentListPreview();
+  const seatInput = document.getElementById('seat-count');
+  if (seatInput) {
+    seatInput.value = state.students.length;
+    onSeatCountChange();
+    renderSeats();
+    updateBadge();
+  } else {
+    initSeats();
+    renderSeats();
+  }
+  toast(`${state.students.length}명의 학생 명단을 불러왔습니다.`);
+}
+
 export async function downloadTemplate() {
-  if (!window.pywebview) {
-    toast('브라우저 환경에서는 지원하지 않습니다.', true);
+  if (window.pywebview && window.pywebview.api && window.pywebview.api.download_template) {
+    const res = await window.pywebview.api.download_template();
+    if (res && res.ok) {
+      toast('양식을 성공적으로 내려받았습니다.');
+    } else if (res && !res.ok && res.error) {
+      toast('저장 취소 또는 오류가 발생했습니다.', true);
+    }
     return;
   }
-  const res = await window.pywebview.api.download_template();
-  if (res && res.ok) {
+
+  // 순수 브라우저 환경 (GitHub Pages / Web App)
+  try {
+    const a = document.createElement('a');
+    a.href = '자리배치명단(양식).xlsx';
+    a.download = '자리배치명단(양식).xlsx';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
     toast('양식을 성공적으로 내려받았습니다.');
-  } else if (res && !res.ok && res.error) {
-    toast('저장 취소 또는 오류가 발생했습니다.', true);
+  } catch (e) {
+    toast('양식 다운로드 중 오류가 발생했습니다.', true);
   }
 }
 
 export async function loadStudentExcel() {
-  if (!window.pywebview) {
-    toast('브라우저 환경에서는 지원하지 않습니다.', true);
+  if (window.pywebview && window.pywebview.api && window.pywebview.api.load_excel) {
+    const res = await window.pywebview.api.load_excel();
+    if (res && res.ok) {
+      applyLoadedStudents(res.students);
+    } else if (res && !res.ok && res.error) {
+      toast('명단을 불러오는 데 실패했습니다: ' + res.error, true);
+    }
     return;
   }
-  const res = await window.pywebview.api.load_excel();
-  if (res && res.ok) {
-    state.students = res.students;
-    updateStudentListPreview();
-    const seatInput = document.getElementById('seat-count');
-    if (seatInput) {
-      seatInput.value = state.students.length;
-      onSeatCountChange();
-      renderSeats();
-      updateBadge();
-    } else {
-      initSeats();
-      renderSeats();
-    }
-    toast(`${state.students.length}명의 학생 명단을 불러왔습니다.`);
-  } else if (res && !res.ok && res.error) {
-    toast('명단을 불러오는 데 실패했습니다: ' + res.error, true);
+
+  // 순수 브라우저 환경 (GitHub Pages / Web App - SheetJS)
+  if (typeof XLSX === 'undefined') {
+    toast('엑셀 라이브러리(SheetJS)를 로드할 수 없습니다.', true);
+    return;
   }
+
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = '.xlsx, .xls';
+  fileInput.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const data = new Uint8Array(evt.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        const jsonRows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+        const students = [];
+        for (let i = 1; i < jsonRows.length; i++) {
+          const row = jsonRows[i];
+          if (!row || row.length === 0) continue;
+          const num = row[0] !== undefined && row[0] !== null ? String(row[0]).trim() : '';
+          const name = row[1] !== undefined && row[1] !== null ? String(row[1]).trim() : '';
+          let gender = row[2] !== undefined && row[2] !== null ? String(row[2]).trim() : '';
+
+          if (gender.startsWith('남') || gender.toUpperCase() === 'M') gender = '남';
+          else if (gender.startsWith('여') || gender.toUpperCase() === 'F') gender = '여';
+          else gender = '';
+
+          if (name) {
+            students.push({ id: num, name, gender });
+          }
+        }
+        if (students.length === 0) {
+          toast('엑셀 파일에서 학생 명단을 찾을 수 없습니다.', true);
+          return;
+        }
+        applyLoadedStudents(students);
+      } catch (err) {
+        toast('엑셀 읽기 오류: ' + err.message, true);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
+  fileInput.click();
 }
 
 export async function exportToExcel() {
