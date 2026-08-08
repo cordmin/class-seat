@@ -372,6 +372,10 @@ export function cleanupCountdownEvents() {
     window.removeEventListener('click', currentCancelClickHandler, true);
     currentCancelClickHandler = null;
   }
+  const overlay = document.getElementById('countdown-overlay');
+  if (overlay) {
+    overlay.style.display = 'none';
+  }
 }
 
 export function setBubbleText(htmlContent, isCounting = false) {
@@ -449,10 +453,30 @@ export function startArrangeCountdown(prevState) {
   cleanupCountdownEvents();
   let n = 5;
 
-  setBubbleText(`<span style="font-size:15px;">공개까지 <span style="font-size:21px; font-weight:900; color:#f43f5e; margin:0 2px;">${n}</span>초 전!</span>`, true);
+  const overlay = document.getElementById('countdown-overlay');
+  const charImg = document.getElementById('countdown-char-img');
+  const numText = document.getElementById('countdown-num-text');
+
+  const updateCountdownDisplay = (count) => {
+    setBubbleText(`<span style="font-size:15px;">공개까지 <span style="font-size:21px; font-weight:900; color:#f43f5e; margin:0 2px;">${count}</span>초 전!</span>`, true);
+    if (overlay && charImg && numText) {
+      charImg.style.animation = 'none';
+      numText.style.animation = 'none';
+      void charImg.offsetWidth;
+      void numText.offsetWidth;
+
+      charImg.src = `loopy/${count}.png`;
+      numText.textContent = count;
+
+      charImg.style.animation = 'countdownPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+      numText.style.animation = 'countdownPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+      overlay.style.display = 'flex';
+    }
+  };
+
+  updateCountdownDisplay(n);
   playMarimbaStep(n);
 
-  // 카운트다운 실행 중 프로그램 내부 임의 클릭 시 즉시 취소 핸들러 등록
   setTimeout(() => {
     if (state.countdownTimer && !state.isArrangementCancelled) {
       currentCancelClickHandler = (e) => {
@@ -483,7 +507,7 @@ export function startArrangeCountdown(prevState) {
       }, 3000);
     } else {
       playMarimbaStep(n);
-      setBubbleText(`<span style="font-size:15px;">공개까지 <span style="font-size:21px; font-weight:900; color:#f43f5e; margin:0 2px;">${n}</span>초 전!</span>`, true);
+      updateCountdownDisplay(n);
     }
   }, 1000);
 }

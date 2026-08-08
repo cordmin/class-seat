@@ -162,7 +162,7 @@ def main():
         min_size=(900, 600),
         resizable=True
     )
-    
+
     webview.start(
         debug=False,
         private_mode=False,
