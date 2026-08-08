@@ -319,72 +319,17 @@ export async function exportToExcel() {
   }
 }
 
-export async function saveAsImage() {
-  const boardArea = document.getElementById('board-area');
-  if (!boardArea) return;
-
-  const today = new Date();
-  const yy = String(today.getFullYear()).slice(-2);
-  const mm = String(today.getMonth() + 1).padStart(2, '0');
-  const dd = String(today.getDate()).padStart(2, '0');
-  const filename = `자리배치(${yy}.${mm}.${dd}).png`;
-
-  toast('이미지 생성 중...');
-
-  try {
-    const canvas = await html2canvas(boardArea, {
-      backgroundColor: '#fdf8f3',
-      scale: 2,
-      useCORS: true,
-      logging: false,
-    });
-
-    const padded = document.createElement('canvas');
-    const pad = 40;
-    padded.width = canvas.width + pad * 2;
-    padded.height = canvas.height + pad * 2;
-    const ctx = padded.getContext('2d');
-    ctx.fillStyle = '#fdf8f3';
-    ctx.fillRect(0, 0, padded.width, padded.height);
-    ctx.drawImage(canvas, pad, pad);
-
-    const dataUrl = padded.toDataURL('image/png');
-    if (window.pywebview && window.pywebview.api && window.pywebview.api.save_file) {
-      const result = await window.pywebview.api.save_file(filename, dataUrl);
-      if (result.ok) {
-        toast(`저장 완료`);
-      } else if (result.error) {
-        toast('저장 취소 또는 실패: ' + result.error, true);
-      }
-    } else {
-      const link = document.createElement('a');
-      link.download = filename;
-      link.href = dataUrl;
-      link.click();
-      toast('이미지가 저장되었습니다!');
-    }
-  } catch (err) {
-    toast('이미지 생성 실패: ' + err.message, true);
-  }
-}
-
-export async function printScreen() {
-  if (!state.seats.some(s => s.student)) {
-    toast('먼저 학생 명단을 적용하고 자리를 배치해주세요.', true);
-    return;
-  }
-  if (document.getElementById('temp-print-wrap')) return;
-  toast('인쇄를 준비합니다...');
-
+function buildPrintContainer() {
   const seatsWrap = document.getElementById('seats-wrap');
-  if (!seatsWrap) return;
+  if (!seatsWrap) return null;
 
   const originalParent = seatsWrap.parentElement;
   const originalNextSibling = seatsWrap.nextSibling;
+  const originalSeatsWrapOrder = seatsWrap.style.order;
 
   const printWrap = document.createElement('div');
   printWrap.id = 'temp-print-wrap';
-  printWrap.style.cssText = 'position:fixed; left:50%; top:50%; width:max-content; max-width:none; background:#ffffff; padding:15px; box-sizing:border-box; display:flex; flex-direction:row; gap:20px; align-items:center; justify-content:center; transform:translate(-50%,-50%); transform-origin:center center; z-index:99999;';
+  printWrap.style.cssText = 'position:fixed; left:50%; top:50%; width:max-content; max-width:none; background:#ffffff; padding:20px; box-sizing:border-box; display:flex; flex-direction:row; gap:20px; align-items:center; justify-content:center; transform:translate(-50%,-50%); transform-origin:center center; z-index:99999; border-radius:12px;';
 
   // 1. 좌측 학생 명단 표 생성 (번호 | 이름 | 성별)
   const listDiv = document.createElement('div');
@@ -428,8 +373,6 @@ export async function printScreen() {
   bbEl.textContent = isTeacher ? '칠 판 (교사 시점)' : '칠 판';
 
   printWrap.appendChild(listDiv);
-  
-  const originalSeatsWrapOrder = seatsWrap.style.order;
 
   if (isTeacher) {
     seatsWrap.style.order = '1';
@@ -444,6 +387,87 @@ export async function printScreen() {
   }
   
   printWrap.appendChild(rightWrap);
+
+  const cleanup = () => {
+    seatsWrap.style.order = originalSeatsWrapOrder;
+    if (originalNextSibling) {
+      originalParent.insertBefore(seatsWrap, originalNextSibling);
+    } else {
+      originalParent.appendChild(seatsWrap);
+    }
+    printWrap.remove();
+  };
+
+  return { printWrap, cleanup };
+}
+
+export async function saveAsImage() {
+  if (!state.seats.some(s => s.student)) {
+    toast('먼저 학생 명단을 적용하고 자리를 배치해주세요.', true);
+    return;
+  }
+  if (document.getElementById('temp-print-wrap')) return;
+
+  toast('이미지 생성 중...');
+
+  const layout = buildPrintContainer();
+  if (!layout) return;
+
+  const { printWrap, cleanup } = layout;
+  printWrap.style.transform = 'none';
+  printWrap.style.left = '-9999px';
+  printWrap.style.top = '-9999px';
+  document.body.appendChild(printWrap);
+
+  const today = new Date();
+  const yy = String(today.getFullYear()).slice(-2);
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  const filename = `자리배치(${yy}.${mm}.${dd}).png`;
+
+  try {
+    const canvas = await html2canvas(printWrap, {
+      backgroundColor: '#ffffff',
+      scale: 2,
+      useCORS: true,
+      logging: false,
+    });
+
+    const dataUrl = canvas.toDataURL('image/png');
+    cleanup();
+
+    if (window.pywebview && window.pywebview.api && window.pywebview.api.save_file) {
+      const result = await window.pywebview.api.save_file(filename, dataUrl);
+      if (result.ok) {
+        toast(`저장 완료`);
+      } else if (result.error) {
+        toast('저장 취소 또는 실패: ' + result.error, true);
+      }
+    } else {
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = dataUrl;
+      link.click();
+      toast('이미지가 저장되었습니다!');
+    }
+  } catch (err) {
+    cleanup();
+    toast('이미지 생성 실패: ' + err.message, true);
+  }
+}
+
+export async function printScreen() {
+  if (!state.seats.some(s => s.student)) {
+    toast('먼저 학생 명단을 적용하고 자리를 배치해주세요.', true);
+    return;
+  }
+  if (document.getElementById('temp-print-wrap')) return;
+  toast('인쇄를 준비합니다...');
+
+  const layout = buildPrintContainer();
+  if (!layout) return;
+
+  const { printWrap, cleanup } = layout;
   document.body.appendChild(printWrap);
 
   // A4 가로 1페이지 완벽 중앙 정렬 및 자동 스케일링
@@ -458,13 +482,7 @@ export async function printScreen() {
 
   setTimeout(() => {
     window.print();
-    seatsWrap.style.order = originalSeatsWrapOrder;
-    if (originalNextSibling) {
-      originalParent.insertBefore(seatsWrap, originalNextSibling);
-    } else {
-      originalParent.appendChild(seatsWrap);
-    }
-    printWrap.remove();
+    cleanup();
   }, 300);
 }
 
