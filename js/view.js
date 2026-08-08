@@ -575,8 +575,8 @@ export function fitToWorkspace() {
     document.documentElement.style.setProperty('--row-gap', `${baseRowGap}px`);
 
     const boardRect = boardArea.getBoundingClientRect();
-    const actualUnscaledW = Math.max(boardArea.scrollWidth, seatsWrap.offsetWidth, 400) + 40;
-    const actualUnscaledH = Math.max(boardArea.scrollHeight, boardRect.height) + (isTeacherMode ? 90 : 60);
+    const actualUnscaledW = Math.max(boardArea.scrollWidth, seatsWrap.offsetWidth, 400) + 24;
+    const actualUnscaledH = Math.max(boardArea.scrollHeight, boardRect.height) + 24;
 
     const availW = workspace.clientWidth - 24;
     const availH = workspace.clientHeight - 24;
@@ -586,14 +586,7 @@ export function fitToWorkspace() {
     // 2. 가로/세로 비율 중 더 작은 스케일 선택
     const scaleX = availW / actualUnscaledW;
     const scaleY = availH / actualUnscaledH;
-    let scale = Math.min(scaleX, scaleY);
-
-    // 교사 시점(칠판 아래 배치) 및 학생 시점 하단 테두리 잘림을 방지하기 위한 안전 여백 적용
-    if (isTeacherMode) {
-      scale *= 0.90; // 교사 시점: 칠판이 아래로 내려가므로 10% 추가 안전 여백
-    } else {
-      scale *= 0.94; // 학생 시점: 아래쪽 자리 테두리 보존 6% 안전 여백
-    }
+    let scale = Math.min(scaleX, scaleY) * 0.96; // 4% 안전 여백
 
     if (scale > 1.6) scale = 1.6;
     if (scale < 0.12) scale = 0.12;
