@@ -927,13 +927,13 @@
 }
 
 .countdown-img-wrap {
-  width: 320px;
-  height: 320px;
+  width: clamp(250px, 40vmin, 580px);
+  height: clamp(250px, 40vmin, 580px);
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  margin-bottom: -35px;
+  margin-bottom: calc(clamp(250px, 40vmin, 580px) * -0.12);
 }
 
 #countdown-char-img {
@@ -945,24 +945,24 @@
 }
 
 #countdown-num-text {
-  font-size: 110px;
+  font-size: clamp(90px, 15vmin, 220px);
   font-weight: 900;
   color: #ffffff;
-  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 16px rgba(241, 139, 167, 0.9);
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 20px rgba(241, 139, 167, 0.9);
   line-height: 1;
-  margin-bottom: 12px;
+  margin-bottom: clamp(10px, 2vmin, 24px);
   z-index: 2;
   font-family: 'Noto Sans KR', sans-serif;
   animation: countdownPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
 .countdown-sub-hint {
-  font-size: 14px;
+  font-size: clamp(13px, 2vmin, 22px);
   font-weight: 700;
   color: rgba(255, 255, 255, 0.9);
   background: rgba(0, 0, 0, 0.35);
-  padding: 6px 16px;
-  border-radius: 20px;
+  padding: clamp(6px, 1vmin, 12px) clamp(16px, 2.5vmin, 32px);
+  border-radius: 30px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.2);
   backdrop-filter: blur(4px);
 }

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>학급 자리배치 프로그램</title>
+  <link rel="icon" type="image/x-icon" href="loopy.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;700;900&family=Poor+Story&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+<div id="sidebar">
+  <div class="sb-body" id="sb-body">
+
+    <!-- 사이드바 상단 캐릭터 이미지 & 말풍선 -->
+    <div style="display:flex; align-items:center; gap:10px; margin-top:15px; margin-bottom:14px;">
+      <img src="loopy.jpg" alt="캐릭터" style="width:75px; height:75px; object-fit:cover; border-radius:18px; border:3px solid #ffffff; box-shadow:0 4px 12px rgba(235,104,156,0.3); flex-shrink:0;">
+      <div id="char-bubble" class="speech-bubble" title="클릭 시 배치 취소">
+        <span id="bubble-text">오늘의 자리를 배치해볼까요?</span>
+      </div>
+    </div>
+
+    <!-- 명렬표 엑셀 관련 카드 -->
+    <div class="card">
+      <div class="card-head" style="display:flex; align-items:center; justify-content:space-between;">학생 명단
+        <span id="btn-view-students" style="display:none; background:#F18BA7; color:#fff; padding:3px 9px; border-radius:10px; font-size:11px; font-weight:800; cursor:pointer; white-space:nowrap; box-shadow:0 2px 6px rgba(241,139,167,0.25);" onclick="openStudentModal()"><span id="count-num">0</span>명</span>
+      </div>
+      <div class="card-body" style="display:flex; gap:6px; align-items:stretch;">
+        <div class="tooltip-wrap">
+          <button style="width:36px; height:100%; min-height:34px; padding:0; background:#ef4444; color:#ffffff; border:1px solid #ef4444; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; cursor:pointer; transition:opacity .15s, transform .1s;" onclick="resetStudentList()" onmouseover="this.style.opacity='0.9';" onmouseout="this.style.opacity='1';">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
+              <path d="M3 6h18"></path>
+              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+          </button>
+          <div class="custom-tooltip">명단 초기화</div>
+        </div>
+        <button class="exec-btn-sm outline" style="flex:1; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="downloadTemplate()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          양식 받기
+        </button>
+        <button class="exec-btn-sm outline" style="flex:1; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="loadStudentExcel()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2z"/></svg>
+          명단 열기
+        </button>
+      </div>
+    </div>
+
+    <!-- 책상 배열 카드 -->
+    <div class="card">
+      <div class="card-head">배치 설정</div>
+      <div class="card-body">
+        <div class="grid2 mb6">
+          <div>
+            <label class="lbl">책상 총수</label>
+            <input class="inp inp-num" type="number" id="seat-count" min="1" max="60" value="30" onchange="onSeatCountChange()">
+          </div>
+          <div>
+            <label class="lbl">분단 수</label>
+            <input class="inp inp-num" type="number" id="col-count" min="2" max="6" step="1" value="5" onchange="onColCountChange()">
+          </div>
+        </div>
+
+        <div class="grid2 mb6">
+          <div>
+            <label class="lbl">책상 배열</label>
+            <select class="inp" id="layout-type" onchange="onLayoutChange()">
+              <option value="single">혼자앉기</option>
+              <option value="pair">짝궁배열</option>
+              <option value="group">4인모둠(2x2)</option>
+              <option value="group6">6인모둠(2x3)</option>
+            </select>
+          </div>
+          <div>
+            <label class="lbl">배치 방법</label>
+            <select class="inp" id="sort-algo" onchange="onAlgoChange()"></select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 자리 배치 및 실행 카드 -->
+    <div class="card">
+      <div class="card-head">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <label class="switch">
+            <input type="checkbox" id="countdown-opt">
+            <span class="slider"></span>
+          </label>
+          <span class="toggle-label">카운트 다운</span>
+          <label class="switch" style="margin-left:20px;">
+            <input type="checkbox" id="teacher-view-toggle" onchange="toggleTeacherView()">
+            <span class="slider"></span>
+          </label>
+          <span class="toggle-label">교사 시점</span>
+        </div>
+      </div>
+      <div class="card-body" style="display:flex; gap:8px;">
+        <div class="tooltip-wrap" style="flex:2;">
+          <button class="exec-btn" style="width:100%; height:100%; justify-content:center; align-items:center; padding:12px; background:#F04A4A; color:#fff; border:none; border-radius:10px;" onclick="resetArrangement()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 6h18"></path>
+              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+          </button>
+          <div class="custom-tooltip">자리배치 초기화</div>
+        </div>
+        <button class="exec-btn" style="flex:7; justify-content:center; padding:12px; font-size:15px; background:#ffffff; color:#F18BA7; border:2px solid #F18BA7; border-radius:10px; font-weight:900; box-shadow:0 2px 8px rgba(241,139,167,0.15);" onclick="executeArrangement()">자리 배치 실행</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">자리 배치결과</div>
+      <div class="card-body">
+        <div style="display:flex; gap:5px; margin-top:4px;">
+          <button class="exec-btn-sm outline" style="flex:1; display:inline-flex; align-items:center; justify-content:center; gap:5px;" onclick="printScreen()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v5"/><path d="M6 18H5a3 3 0 0 1-3-3v-3a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3v3a3 3 0 0 1-3 3h-1"/><rect x="6" y="14" width="12" height="7" rx="1"/></svg>
+            인쇄
+          </button>
+          <button class="exec-btn-sm outline" id="btn-save-pop" style="flex:1; position:relative; display:inline-flex; align-items:center; justify-content:center; gap:5px;" onclick="toggleSaveMenu(event)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10.2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></svg>
+            저장
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 사이드바 하단 제작자 문구 -->
+    <div style="margin-top:37px; margin-bottom:4px; text-align:center;">
+      <a href="https://dorms.school" target="_blank" onclick="if(window.pywebview){event.preventDefault(); window.pywebview.api.open_url('https://dorms.school');}" style="font-size:11px; font-weight:800; color:#ffffff; text-decoration:none; display:inline-block; letter-spacing:0.02em; cursor:pointer; transition:opacity 0.2s;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';">
+        by Dorms member Tachyon
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<div id="sb-resizer"></div>
+
+<div id="main">
+
+  <div id="workspace">
+    <div id="board-area">
+      <div class="blackboard" id="blackboard-el">칠판</div>
+      <div class="board-spacer"></div>
+      <div id="seats-wrap">
+        <div id="seats-container" class="cols-container"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 카운트다운 화면 중앙 오버레이 -->
+<div id="countdown-overlay" class="countdown-mbg" style="display:none;">
+  <div class="countdown-content">
+    <div class="countdown-img-wrap">
+      <img id="countdown-char-img" src="" alt="캐릭터">
+    </div>
+    <div id="countdown-num-text">5</div>
+    <div class="countdown-sub-hint">클릭 또는 ESC 누르면 배치 취소</div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- 예쁜 커스텀 확인 모달 -->
+<div id="confirm-modal" class="mbg" style="display:none; z-index:1000;">
+  <div class="modal" style="background:#ffffff; border-radius:20px; border:2.5px solid #F18BA7; box-shadow:0 12px 36px rgba(241,139,167,0.35); text-align:center; padding:26px 22px; width:min(380px, 92vw);">
+    <div style="font-size:38px; margin-bottom:8px;">🗑️</div>
+    <h3 style="font-size:17px; font-weight:900; color:#3e2410; margin-bottom:8px;">초기화 확인</h3>
+    <div class="modal-msg" id="confirm-msg" style="font-size:13.5px; color:#4b5563; margin-bottom:22px; line-height:1.55; word-break:keep-all;"></div>
+    <div class="modal-btns" style="display:flex; gap:10px;">
+      <button class="btn-cancel" onclick="closeConfirm(false)" style="flex:1; padding:11px; border-radius:10px; background:#f3f4f6; color:#4b5563; font-weight:700; border:none; cursor:pointer; font-size:13.5px; transition:background .15s;">취소</button>
+      <button class="btn-ok" onclick="closeConfirm(true)" style="flex:1; padding:11px; border-radius:10px; background:#ef4444; color:#ffffff; font-weight:900; border:none; cursor:pointer; font-size:13.5px; box-shadow:0 4px 10px rgba(239,68,68,0.3); transition:transform .1s, opacity .15s;">초기화</button>
+    </div>
+  </div>
+</div>
+
+<!-- 우클릭 컨텍스트 메뉴 -->
+<div id="ctx-menu">
+  <div class="ctx-head" id="ctx-head"></div>
+  <div class="ctx-sep"></div>
+  <div id="ctx-items"></div>
+</div>
+
+<!-- 불러온 명단 확인 모달 -->
+<div id="student-list-modal" class="mbg" style="display:none; z-index:900;">
+  <div class="modal" style="width: min(400px, 92vw); max-height:80vh; display:flex; flex-direction:column; padding:0; overflow:hidden; border-radius:16px;">
+    <div style="padding:16px 20px; background:#F18BA7; color:#fff; display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="margin:0; font-size:16px; color:#fff; font-weight:800;">현재 적용된 학생 명단</h3>
+      <button onclick="closeStudentModal()" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer; line-height:1;">&times;</button>
+    </div>
+    <div id="modal-student-list-content" style="padding:16px; overflow-y:auto; flex:1; background:var(--bg);">
+      <!-- students go here -->
+    </div>
+  </div>
+</div>
+
+<!-- 저장 옵션 팝오버 모달 -->
+<div id="save-popover">
+  <button class="pop-item-btn" onclick="saveAsImage(); hideSaveMenu();">이미지 파일로 저장</button>
+</div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
