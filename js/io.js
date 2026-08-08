@@ -329,7 +329,7 @@ function buildPrintContainer() {
 
   const printWrap = document.createElement('div');
   printWrap.id = 'temp-print-wrap';
-  printWrap.style.cssText = 'position:fixed; left:50%; top:50%; width:max-content; max-width:none; background:#ffffff; padding:20px; box-sizing:border-box; display:flex; flex-direction:row; gap:20px; align-items:center; justify-content:center; transform:translate(-50%,-50%); transform-origin:center center; z-index:99999; border-radius:12px;';
+  printWrap.style.cssText = 'position:fixed; left:50%; top:50%; width:max-content; max-width:none; background:#ffffff; padding:20px; box-sizing:border-box; display:flex; flex-direction:row; gap:20px; align-items:center; justify-content:center; transform:translate(-50%,-50%); transform-origin:center center; z-index:99999; border-radius:12px; --cell-w:80px; --cell-h:60px; --col-gap:28px; --row-gap:10px; --name-size:13px; --id-size:10px;';
 
   // 1. 좌측 학생 명단 표 생성 (번호 | 이름 | 성별)
   const listDiv = document.createElement('div');
@@ -396,6 +396,11 @@ function buildPrintContainer() {
       originalParent.appendChild(seatsWrap);
     }
     printWrap.remove();
+
+    // 인쇄 종료 후 화면 레이아웃 스케일 복원
+    if (typeof window.fitToWorkspace === 'function') {
+      window.fitToWorkspace();
+    }
   };
 
   return { printWrap, cleanup };

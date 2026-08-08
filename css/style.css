@@ -853,6 +853,12 @@
       break-inside: avoid !important;
       page-break-after: avoid !important;
       break-after: avoid !important;
+      --cell-w: 82px !important;
+      --cell-h: 62px !important;
+      --col-gap: 28px !important;
+      --row-gap: 10px !important;
+      --name-size: 13px !important;
+      --id-size: 10px !important;
     }
 
     * {
