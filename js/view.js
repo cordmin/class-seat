@@ -574,11 +574,12 @@ export function fitToWorkspace() {
     document.documentElement.style.setProperty('--col-gap', `${baseColGap}px`);
     document.documentElement.style.setProperty('--row-gap', `${baseRowGap}px`);
 
-    const actualUnscaledW = Math.max(boardArea.scrollWidth, seatsWrap.offsetWidth, 400) + 30;
-    const actualUnscaledH = boardArea.scrollHeight + (isTeacherMode ? 50 : 30);
+    const boardRect = boardArea.getBoundingClientRect();
+    const actualUnscaledW = Math.max(boardArea.scrollWidth, seatsWrap.offsetWidth, 400) + 40;
+    const actualUnscaledH = Math.max(boardArea.scrollHeight, boardRect.height) + (isTeacherMode ? 90 : 60);
 
-    const availW = workspace.clientWidth - 20;
-    const availH = workspace.clientHeight - 20;
+    const availW = workspace.clientWidth - 24;
+    const availH = workspace.clientHeight - 24;
 
     if (availW <= 0 || availH <= 0) return;
 
@@ -587,15 +588,18 @@ export function fitToWorkspace() {
     const scaleY = availH / actualUnscaledH;
     let scale = Math.min(scaleX, scaleY);
 
+    // 교사 시점(칠판 아래 배치) 및 학생 시점 하단 테두리 잘림을 방지하기 위한 안전 여백 적용
     if (isTeacherMode) {
-      scale *= 1.04;
+      scale *= 0.90; // 교사 시점: 칠판이 아래로 내려가므로 10% 추가 안전 여백
+    } else {
+      scale *= 0.94; // 학생 시점: 아래쪽 자리 테두리 보존 6% 안전 여백
     }
 
     if (scale > 1.6) scale = 1.6;
     if (scale < 0.12) scale = 0.12;
 
-    const cellW = Math.max(28, Math.floor(baseCellW * scale));
-    const cellH = Math.max(20, Math.floor(baseCellH * scale));
+    const cellW = Math.max(26, Math.floor(baseCellW * scale));
+    const cellH = Math.max(18, Math.floor(baseCellH * scale));
     const colGap = Math.max(3, Math.floor(baseColGap * scale));
     const rowGap = Math.max(2, Math.floor(baseRowGap * scale));
 
@@ -603,8 +607,8 @@ export function fitToWorkspace() {
     document.documentElement.style.setProperty('--cell-h', `${cellH}px`);
     document.documentElement.style.setProperty('--col-gap', `${colGap}px`);
     document.documentElement.style.setProperty('--row-gap', `${rowGap}px`);
-    document.documentElement.style.setProperty('--name-size', `${Math.max(9, Math.floor(15 * scale + 2))}px`);
-    document.documentElement.style.setProperty('--id-size', `${Math.max(7, Math.floor(11 * scale + 2))}px`);
+    document.documentElement.style.setProperty('--name-size', `${Math.max(9, Math.floor(15 * scale + 1.5))}px`);
+    document.documentElement.style.setProperty('--id-size', `${Math.max(7, Math.floor(11 * scale + 1.5))}px`);
 
     const container = document.getElementById('seats-container');
     if (container) container.style.gap = `${colGap}px`;
