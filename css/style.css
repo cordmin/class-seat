@@ -412,11 +412,11 @@
   #workspace {
     flex: 1;
     overflow: auto;
-    padding: 16px 12px;
+    padding: 20px 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
   }
 
   #board-area {
@@ -471,7 +471,7 @@
     border-right: 4px solid #3d6e40;
     border-bottom: 3px solid #3d2a10;
     box-shadow: 0 4px 10px rgba(0,0,0,.25);
-    margin-bottom: 24px;
+    margin-bottom: 20px;
   }
 
   #seats-wrap {
@@ -485,9 +485,8 @@
   }
 
   /* 교사 시점 활성화 시 Flex Order 순서 변경 */
-  /* Match the blackboard top/bottom spacing to workspace top padding (32px) for consistent visual balance */
-  #board-area.teacher-mode .blackboard { order: 3; margin-top: 28px; }
-  #board-area.teacher-mode .board-spacer { order: 4; margin-bottom: 20px; }
+  #board-area.teacher-mode .blackboard { order: 3; margin-top: 20px; }
+  #board-area.teacher-mode .board-spacer { order: 4; margin-bottom: 0; }
   #board-area.teacher-mode #seats-wrap { order: 1; margin-top: 0; }
 
   .cols-container {
