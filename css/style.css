@@ -1031,3 +1031,134 @@
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+/* ── 32인치 이상 대형 고해상도 모니터 반응형 자동 확대 스케일 (QHD / 4K) ── */
+@media (min-height: 900px) and (min-width: 1500px) {
+  :root {
+    --sb-width: 370px;
+    --cell-w: 128px;
+    --cell-h: 92px;
+    --row-gap: 12px;
+    --col-gap: 75px;
+    --name-size: 29px;
+    --id-size: 23px;
+  }
+
+  body {
+    font-size: 15px;
+  }
+
+  .sb-char-img {
+    width: 90px !important;
+    height: 90px !important;
+  }
+
+  .speech-bubble {
+    font-size: 15px !important;
+    padding: 14px 18px !important;
+  }
+
+  .card-head {
+    font-size: 16px !important;
+    padding: 12px 15px !important;
+  }
+
+  .card-body {
+    padding: 14px 15px !important;
+  }
+
+  .inp {
+    font-size: 14px !important;
+    padding: 9px 12px !important;
+  }
+
+  .lbl {
+    font-size: 13px !important;
+    margin-bottom: 5px !important;
+  }
+
+  .exec-btn {
+    font-size: 18px !important;
+    padding: 14px 24px !important;
+  }
+
+  .exec-btn-sm {
+    font-size: 14px !important;
+    padding: 8px 12px !important;
+  }
+
+  .blackboard {
+    font-size: 26px !important;
+    width: 500px !important;
+    padding: 16px 50px !important;
+  }
+
+  .sb-footer-wrap a {
+    font-size: 13px !important;
+  }
+}
+
+@media (min-height: 1100px) and (min-width: 1900px) {
+  :root {
+    --sb-width: 440px;
+    --cell-w: 152px;
+    --cell-h: 110px;
+    --row-gap: 16px;
+    --col-gap: 92px;
+    --name-size: 34px;
+    --id-size: 27px;
+  }
+
+  body {
+    font-size: 17px;
+  }
+
+  .sb-char-img {
+    width: 110px !important;
+    height: 110px !important;
+  }
+
+  .speech-bubble {
+    font-size: 17px !important;
+    padding: 16px 22px !important;
+  }
+
+  .card-head {
+    font-size: 19px !important;
+    padding: 15px 18px !important;
+  }
+
+  .card-body {
+    padding: 16px 18px !important;
+  }
+
+  .inp {
+    font-size: 16px !important;
+    padding: 11px 14px !important;
+  }
+
+  .lbl {
+    font-size: 14px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .exec-btn {
+    font-size: 21px !important;
+    padding: 16px 28px !important;
+  }
+
+  .exec-btn-sm {
+    font-size: 16px !important;
+    padding: 10px 16px !important;
+  }
+
+  .blackboard {
+    font-size: 32px !important;
+    width: 600px !important;
+    padding: 18px 90px !important;
+  }
+
+  .sb-footer-wrap a {
+    font-size: 15px !important;
+  }
+}
