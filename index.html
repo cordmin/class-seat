@@ -99,17 +99,21 @@
     <!-- 자리 배치 및 실행 카드 -->
     <div class="card">
       <div class="card-head">
-        <div style="display:flex; align-items:center; gap:10px;">
-          <label class="switch">
-            <input type="checkbox" id="countdown-opt">
-            <span class="slider"></span>
-          </label>
-          <span class="toggle-label">카운트 다운</span>
-          <label class="switch" style="margin-left:20px;">
-            <input type="checkbox" id="teacher-view-toggle" onchange="toggleTeacherView()">
-            <span class="slider"></span>
-          </label>
-          <span class="toggle-label">교사 시점</span>
+        <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+          <div style="display:flex; align-items:center; gap:5px;">
+            <label class="switch">
+              <input type="checkbox" id="countdown-opt">
+              <span class="slider"></span>
+            </label>
+            <span class="toggle-label">카운트다운</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:5px;">
+            <label class="switch">
+              <input type="checkbox" id="teacher-view-toggle" onchange="toggleTeacherView()">
+              <span class="slider"></span>
+            </label>
+            <span class="toggle-label">교사 시점</span>
+          </div>
         </div>
       </div>
       <div class="card-body" style="display:flex; gap:8px;">
