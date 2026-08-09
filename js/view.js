@@ -158,9 +158,47 @@ export function createSeatEl(seat) {
   el.addEventListener('dragleave', () => onDragLeave(seat.id));
   el.addEventListener('drop', (e) => onDrop(seat.id, e));
 
+  el.addEventListener('touchstart', (e) => onTouchStart(seat.id, e), { passive: true });
+  el.addEventListener('touchmove', (e) => onTouchMove(seat.id, e), { passive: false });
+  el.addEventListener('touchend', (e) => onTouchEnd(seat.id, e));
+  el.addEventListener('touchcancel', (e) => onTouchCancel(seat.id, e));
+
   const isDraggable = !seat.isGhost && !seat.excluded && !seat.isLocked;
   el.setAttribute('draggable', isDraggable);
   return el;
+}
+
+let touchDragState = {
+  srcId: null,
+  ghostEl: null,
+  startX: 0,
+  startY: 0,
+  isDragging: false,
+  targetSeatId: null
+};
+
+function swapSeats(srcId, dstId) {
+  if (!srcId || !dstId || srcId === dstId) return false;
+  const src = state.seats.find(s => s.id === srcId);
+  const dst = state.seats.find(s => s.id === dstId);
+  if (!src || !dst || src.isGhost || dst.isGhost) return false;
+
+  if (src.isLocked || dst.isLocked) {
+    toast('잠긴 자리는 교환할 수 없습니다.', true);
+    renderSeats();
+    return false;
+  }
+
+  [src.student, dst.student] = [dst.student, src.student];
+  if (dst.student) dst.excluded = false;
+  if (src.student) src.excluded = false;
+  src.isLocked = false; dst.isLocked = false;
+  src.fixedFor = null; dst.fixedFor = null;
+
+  renderSeats();
+  updateBadge();
+  saveAutoState();
+  return true;
 }
 
 function onSeatClick(id, e) {
@@ -246,25 +284,115 @@ function onDrop(id, e) {
   const srcId = state.dragSrcId || e.dataTransfer.getData('text/plain');
   state.dragSrcId = null;
   if (!srcId || srcId === id) { renderSeats(); return; }
-  const src = state.seats.find(s => s.id === srcId);
-  const dst = state.seats.find(s => s.id === id);
-  if (!src || !dst) { renderSeats(); return; }
+  swapSeats(srcId, id);
+}
 
-  if (src.isLocked || dst.isLocked) {
-    toast('잠긴 자리는 교환할 수 없습니다.', true);
-    renderSeats();
-    return;
+function onTouchStart(id, e) {
+  if (e.touches.length !== 1) return;
+  const seat = state.seats.find(s => s.id === id);
+  if (!seat || seat.isGhost || seat.excluded) return;
+
+  const touch = e.touches[0];
+  touchDragState.srcId = id;
+  touchDragState.startX = touch.clientX;
+  touchDragState.startY = touch.clientY;
+  touchDragState.isDragging = false;
+  touchDragState.targetSeatId = null;
+
+  if (touchDragState.ghostEl) {
+    touchDragState.ghostEl.remove();
+    touchDragState.ghostEl = null;
+  }
+}
+
+function onTouchMove(id, e) {
+  if (!touchDragState.srcId || e.touches.length !== 1) return;
+  const touch = e.touches[0];
+  const dx = touch.clientX - touchDragState.startX;
+  const dy = touch.clientY - touchDragState.startY;
+
+  if (!touchDragState.isDragging && Math.hypot(dx, dy) > 8) {
+    const seat = state.seats.find(s => s.id === touchDragState.srcId);
+    if (!seat || seat.isLocked) {
+      if (seat && seat.isLocked) toast('잠긴 자리는 이동할 수 없습니다.', true);
+      touchDragState.srcId = null;
+      return;
+    }
+    touchDragState.isDragging = true;
+
+    const ghost = document.createElement('div');
+    ghost.className = 'touch-drag-ghost';
+    if (seat.student) {
+      ghost.innerHTML = `<span class="seat-id">${seat.student.id}</span><span class="seat-name">${seat.student.name}</span>`;
+      if (seat.student.gender === '남') ghost.classList.add('male');
+      else if (seat.student.gender === '여') ghost.classList.add('female');
+    } else {
+      ghost.innerHTML = '<span class="seat-name" style="font-size:12px;color:#94a3b8;">빈자리</span>';
+    }
+    document.body.appendChild(ghost);
+    touchDragState.ghostEl = ghost;
   }
 
-  [src.student, dst.student] = [dst.student, src.student];
-  if (dst.student) dst.excluded = false;
-  if (src.student) src.excluded = false;
-  src.isLocked = false; dst.isLocked = false;
-  src.fixedFor = null; dst.fixedFor = null;
+  if (touchDragState.isDragging) {
+    if (e.cancelable) e.preventDefault();
 
-  renderSeats();
-  updateBadge();
-  saveAutoState();
+    if (touchDragState.ghostEl) {
+      touchDragState.ghostEl.style.left = `${touch.clientX}px`;
+      touchDragState.ghostEl.style.top = `${touch.clientY}px`;
+    }
+
+    const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+    const seatEl = elemBelow ? elemBelow.closest('.seat') : null;
+    const hoverSeatId = seatEl ? seatEl.dataset.id : null;
+
+    if (touchDragState.targetSeatId !== hoverSeatId) {
+      if (touchDragState.targetSeatId) {
+        const prevEl = document.querySelector(`[data-id="${touchDragState.targetSeatId}"]`);
+        if (prevEl) prevEl.classList.remove('over');
+      }
+      touchDragState.targetSeatId = hoverSeatId;
+      if (hoverSeatId && hoverSeatId !== touchDragState.srcId) {
+        const currEl = document.querySelector(`[data-id="${hoverSeatId}"]`);
+        if (currEl) currEl.classList.add('over');
+      }
+    }
+  }
+}
+
+function onTouchEnd(id, e) {
+  if (!touchDragState.srcId) return;
+
+  if (touchDragState.ghostEl) {
+    touchDragState.ghostEl.remove();
+    touchDragState.ghostEl = null;
+  }
+
+  if (touchDragState.targetSeatId) {
+    const el = document.querySelector(`[data-id="${touchDragState.targetSeatId}"]`);
+    if (el) el.classList.remove('over');
+  }
+
+  if (touchDragState.isDragging && touchDragState.targetSeatId && touchDragState.targetSeatId !== touchDragState.srcId) {
+    swapSeats(touchDragState.srcId, touchDragState.targetSeatId);
+  }
+
+  touchDragState.srcId = null;
+  touchDragState.isDragging = false;
+  touchDragState.targetSeatId = null;
+}
+
+function onTouchCancel(id, e) {
+  if (touchDragState.ghostEl) {
+    touchDragState.ghostEl.remove();
+    touchDragState.ghostEl = null;
+  }
+  if (touchDragState.targetSeatId) {
+    const el = document.querySelector(`[data-id="${touchDragState.targetSeatId}"]`);
+    if (el) el.classList.remove('over');
+  }
+  touchDragState.srcId = null;
+  touchDragState.isDragging = false;
+  touchDragState.targetSeatId = null;
 }
 
 function openContextMenu(x, y, seat) {
