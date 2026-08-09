@@ -197,11 +197,11 @@
     flex-shrink: 0;
   }
 
-  /* 사이드바 하단 문구 (하단 고정 및 고정 비율) */
+  /* 사이드바 하단 문구 (자리 배치결과 카드 바로 아래 카드간 간격과 동일하게 배치) */
   .sb-footer-wrap {
-    margin-top: auto !important;
-    margin-bottom: 12px !important;
-    padding-top: 10px;
+    margin-top: 0 !important;
+    margin-bottom: 12px;
+    padding-top: 0;
     text-align: center;
     display: flex;
     flex-direction: column;
