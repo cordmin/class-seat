@@ -719,7 +719,7 @@ export function fitToWorkspace() {
 
     const scaleX = availW / unscaledW;
     const scaleY = availH / unscaledH;
-    let scale = Math.min(scaleX, scaleY) * 0.96;
+    let scale = Math.min(scaleX, scaleY) * 0.912;
 
     if (scale > 1.6) scale = 1.6;
     if (scale < 0.2) scale = 0.2;
