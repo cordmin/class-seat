@@ -840,9 +840,28 @@
   .ctx-sep { height: 1px; background: var(--border); margin: 4px 0; }
   .ctx-head { padding: 6px 11px 2px; font-size: 10px; font-weight: 800; color: var(--textm); }
 
+  /* 커서가 영역 내에 있을 때만 깔끔하게 나타나는 스마트 호버 스크롤바 */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+  }
+  *:hover {
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  }
+
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: #c1c9d6; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+    transition: background 0.2s ease-in-out;
+  }
+  *:hover::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.4) !important;
+  }
 
   #sb-resizer {
     display: none;
