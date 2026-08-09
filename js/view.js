@@ -6,7 +6,6 @@ export function renderSeats() {
   const container = document.getElementById('seats-container');
   if (!container) return;
   container.innerHTML = '';
-  container.style.gap = cfg.colGap + 'px';
 
   document.documentElement.style.setProperty('--cell-w', cfg.cellW + 'px');
   document.documentElement.style.setProperty('--cell-h', cfg.cellH + 'px');
@@ -33,7 +32,6 @@ export function renderSeats() {
     const colSeats = colGroups[c] || [];
     const colDiv = document.createElement('div');
     colDiv.className = 'col-group';
-    colDiv.style.gap = cfg.rowGap + 'px';
 
     if (cfg.layoutType === 'single' || cfg.layoutType === 'pair') {
       const labelDiv = document.createElement('div');
@@ -694,46 +692,53 @@ export function fitToWorkspace() {
     const baseCellH = 75;
     const baseColGap = 55;
     const baseRowGap = 15;
-    const isTeacherMode = boardArea.classList.contains('teacher-mode');
 
-    // 1. 베이스 측정값을 임시 적용하여 실제 DOM의 언스케일 폭/높이를 측정
-    document.documentElement.style.setProperty('--cell-w', `${baseCellW}px`);
-    document.documentElement.style.setProperty('--cell-h', `${baseCellH}px`);
-    document.documentElement.style.setProperty('--col-gap', `${baseColGap}px`);
-    document.documentElement.style.setProperty('--row-gap', `${baseRowGap}px`);
+    const cols = cfg.colCount || 5;
+    const rowPattern = getLayoutRows(cfg.layoutType);
+    const seatsPerColRow = rowPattern[0] ? rowPattern[0].length : 1;
 
-    const boardRect = boardArea.getBoundingClientRect();
-    const actualUnscaledW = Math.max(boardArea.scrollWidth, seatsWrap.offsetWidth, 400) + 24;
-    const actualUnscaledH = Math.max(boardArea.scrollHeight, boardRect.height) + 24;
+    let maxRows = 6;
+    if (state.seats && state.seats.length > 0) {
+      const colGroups = {};
+      state.seats.forEach(s => {
+        if (!colGroups[s.colIdx]) colGroups[s.colIdx] = 0;
+        colGroups[s.colIdx]++;
+      });
+      const counts = Object.values(colGroups);
+      const maxCount = counts.length > 0 ? Math.max(...counts) : 6;
+      maxRows = Math.max(1, Math.ceil(maxCount / seatsPerColRow));
+    }
+
+    const unscaledW = cols * (seatsPerColRow * baseCellW) + (cols - 1) * baseColGap + 60;
+    const unscaledH = maxRows * baseCellH + (maxRows - 1) * baseRowGap + 160;
 
     const availW = workspace.clientWidth - 24;
-    const availH = workspace.clientHeight - 48;
+    const availH = workspace.clientHeight - 32;
 
     if (availW <= 0 || availH <= 0) return;
 
-    // 2. 가로/세로 비율 중 더 작은 스케일 선택
-    const scaleX = availW / actualUnscaledW;
-    const scaleY = availH / actualUnscaledH;
-    let scale = Math.min(scaleX, scaleY) * 0.92; // 하단 넉넉한 여백용 8% 안전 축소
+    const scaleX = availW / unscaledW;
+    const scaleY = availH / unscaledH;
+    let scale = Math.min(scaleX, scaleY) * 0.96;
 
     if (scale > 1.6) scale = 1.6;
-    if (scale < 0.12) scale = 0.12;
+    if (scale < 0.2) scale = 0.2;
 
-    const cellW = Math.max(26, Math.floor(baseCellW * scale));
-    const cellH = Math.max(18, Math.floor(baseCellH * scale));
-    const colGap = Math.max(3, Math.floor(baseColGap * scale));
-    const rowGap = Math.max(2, Math.floor(baseRowGap * scale));
+    const cellW = Math.max(30, Math.floor(baseCellW * scale));
+    const cellH = Math.max(20, Math.floor(baseCellH * scale));
+    const colGap = Math.max(4, Math.floor(baseColGap * scale));
+    const rowGap = Math.max(3, Math.floor(baseRowGap * scale));
 
     document.documentElement.style.setProperty('--cell-w', `${cellW}px`);
     document.documentElement.style.setProperty('--cell-h', `${cellH}px`);
     document.documentElement.style.setProperty('--col-gap', `${colGap}px`);
     document.documentElement.style.setProperty('--row-gap', `${rowGap}px`);
-    document.documentElement.style.setProperty('--name-size', `${Math.max(10, Math.floor(15 * scale + 2.5))}px`);
+    document.documentElement.style.setProperty('--name-size', `${Math.max(11, Math.floor(15 * scale + 2.5))}px`);
     document.documentElement.style.setProperty('--id-size', `${Math.max(9, Math.floor(11 * scale + 3.5))}px`);
 
     const container = document.getElementById('seats-container');
-    if (container) container.style.gap = `${colGap}px`;
-    document.querySelectorAll('.col-group').forEach(c => c.style.gap = `${rowGap}px`);
+    if (container) container.style.gap = '';
+    document.querySelectorAll('.col-group').forEach(c => c.style.gap = '');
   } catch (e) {
     console.error(e);
   }
