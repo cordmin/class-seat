@@ -910,40 +910,49 @@
     html, body {
       background: #ffffff !important;
       width: 100% !important;
-      height: 100% !important; 
+      height: auto !important; 
       margin: 0 !important;
       padding: 0 !important;
       overflow: visible !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
+      display: block !important;
     }
 
     #temp-print-wrap {
-      position: absolute !important;
-      left: 50% !important;
-      top: 50% !important;
-      margin: 0 !important;
-      padding: 0 !important;
+      position: static !important;
+      left: auto !important;
+      top: auto !important;
+      margin: 0 auto !important;
+      padding: 10px !important;
       background: #ffffff !important;
       display: flex !important;
       flex-direction: row !important;
       gap: 20px !important;
-      align-items: center !important;
+      align-items: flex-start !important;
       justify-content: center !important;
       overflow: visible !important;
       page-break-inside: avoid !important;
       break-inside: avoid !important;
       page-break-after: avoid !important;
       break-after: avoid !important;
-      transform: translate(-50%, -50%) scale(var(--print-scale, 1)) !important;
-      transform-origin: center center !important;
-      --cell-w: 82px !important;
-      --cell-h: 62px !important;
-      --col-gap: 28px !important;
-      --row-gap: 10px !important;
-      --name-size: 13px !important;
+      transform: none !important;
+      width: 100% !important;
+      max-width: 1000px !important;
+      box-sizing: border-box !important;
+      --cell-w: 80px !important;
+      --cell-h: 58px !important;
+      --col-gap: 24px !important;
+      --row-gap: 8px !important;
+      --name-size: 12px !important;
       --id-size: 10px !important;
+    }
+
+    #seats-wrap-print {
+      background: #ffffff !important;
+      border: 2px solid #000000 !important;
+      border-radius: 10px !important;
+      padding: 16px !important;
+      box-shadow: none !important;
+      display: inline-block !important;
     }
 
     * {
@@ -956,7 +965,7 @@
 
     @page {
       size: landscape;
-      margin: 0; 
+      margin: 10mm; 
     }
   }
 

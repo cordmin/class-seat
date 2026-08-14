@@ -323,10 +323,6 @@ function buildPrintContainer() {
   const seatsWrap = document.getElementById('seats-wrap');
   if (!seatsWrap) return null;
 
-  const originalParent = seatsWrap.parentElement;
-  const originalNextSibling = seatsWrap.nextSibling;
-  const originalSeatsWrapOrder = seatsWrap.style.order;
-
   const printWrap = document.createElement('div');
   printWrap.id = 'temp-print-wrap';
   printWrap.style.cssText = 'position:fixed; left:50%; top:50%; width:max-content; max-width:none; background:#ffffff; padding:20px; box-sizing:border-box; display:flex; flex-direction:row; gap:20px; align-items:center; justify-content:center; transform:translate(-50%,-50%); transform-origin:center center; z-index:99999; border-radius:12px; --cell-w:80px; --cell-h:60px; --col-gap:28px; --row-gap:10px; --name-size:13px; --id-size:10px;';
@@ -363,7 +359,7 @@ function buildPrintContainer() {
   tableHtml += '</tbody></table>';
   listDiv.innerHTML = tableHtml;
 
-  // 2. 우측 분단 배치 영역
+  // 2. 우측 분단 배치 영역 (원본 seatsWrap 복제본 사용하여 메인 DOM 보존)
   const isTeacher = state.teacherView;
   const rightWrap = document.createElement('div');
   rightWrap.style.cssText = 'flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; box-sizing:border-box; gap:12px;';
@@ -372,35 +368,26 @@ function buildPrintContainer() {
   bbEl.style.cssText = 'width:70%; max-width:380px; padding:12px 5px; background:#2e4a38; color:#ffffff; font-weight:900; text-align:center; border-radius:6px; font-size:14px; letter-spacing:4px; -webkit-print-color-adjust:exact; print-color-adjust:exact;';
   bbEl.textContent = isTeacher ? '칠 판 (교사 시점)' : '칠 판';
 
+  const seatsWrapClone = seatsWrap.cloneNode(true);
+  seatsWrapClone.id = 'seats-wrap-print';
+  seatsWrapClone.style.order = isTeacher ? '1' : '2';
+
   printWrap.appendChild(listDiv);
 
   if (isTeacher) {
-    seatsWrap.style.order = '1';
     bbEl.style.order = '2';
-    rightWrap.appendChild(seatsWrap);
+    rightWrap.appendChild(seatsWrapClone);
     rightWrap.appendChild(bbEl);
   } else {
     bbEl.style.order = '1';
-    seatsWrap.style.order = '2';
     rightWrap.appendChild(bbEl);
-    rightWrap.appendChild(seatsWrap);
+    rightWrap.appendChild(seatsWrapClone);
   }
   
   printWrap.appendChild(rightWrap);
 
   const cleanup = () => {
-    seatsWrap.style.order = originalSeatsWrapOrder;
-    if (originalNextSibling) {
-      originalParent.insertBefore(seatsWrap, originalNextSibling);
-    } else {
-      originalParent.appendChild(seatsWrap);
-    }
     printWrap.remove();
-
-    // 인쇄 종료 후 화면 레이아웃 스케일 복원
-    if (typeof window.fitToWorkspace === 'function') {
-      window.fitToWorkspace();
-    }
   };
 
   return { printWrap, cleanup };
@@ -466,7 +453,10 @@ export async function printScreen() {
     toast('먼저 학생 명단을 적용하고 자리를 배치해주세요.', true);
     return;
   }
-  if (document.getElementById('temp-print-wrap')) return;
+
+  const existing = document.getElementById('temp-print-wrap');
+  if (existing) existing.remove();
+
   toast('인쇄를 준비합니다...');
 
   const layout = buildPrintContainer();
@@ -475,7 +465,7 @@ export async function printScreen() {
   const { printWrap, cleanup } = layout;
   document.body.appendChild(printWrap);
 
-  // A4 가로 1페이지 완벽 중앙 정렬 및 자동 스케일링
+  // A4 가로 1페이지 화면 기준 스케일 계산 (PC 미리보기 용도)
   const targetW = 880;
   const targetH = 600;
   const w = printWrap.scrollWidth || 1020;
@@ -484,22 +474,27 @@ export async function printScreen() {
   
   printWrap.style.transform = `translate(-50%, -50%) scale(${scale})`;
   printWrap.style.transformOrigin = 'center center';
-  printWrap.style.setProperty('--print-scale', scale.toString());
 
   let isCleaned = false;
   const safeCleanup = () => {
     if (isCleaned) return;
     isCleaned = true;
     window.removeEventListener('afterprint', safeCleanup);
+    window.removeEventListener('focus', onFocusCleanup);
     cleanup();
   };
 
+  const onFocusCleanup = () => {
+    setTimeout(safeCleanup, 800);
+  };
+
   window.addEventListener('afterprint', safeCleanup, { once: true });
+  window.addEventListener('focus', onFocusCleanup, { once: true });
 
   setTimeout(() => {
     window.print();
-    // 모바일/태블릿 브라우저는 window.print()가 비동기이므로 렌더링 생성 후 safeCleanup 호출되도록 지연
-    setTimeout(safeCleanup, 2500);
+    // 모바일/태블릿 비동기 AirPrint 생성을 감안하여 최대 60초 후 안전 정리
+    setTimeout(safeCleanup, 60000);
   }, 300);
 }
 
