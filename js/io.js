@@ -464,7 +464,19 @@ export async function saveAsImage() {
   }
 }
 
+export function isMobileOrTablet() {
+  const ua = navigator.userAgent || navigator.vendor || window.opera || '';
+  const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i;
+  const isMacTouchTablet = /Macintosh/i.test(ua) && (navigator.maxTouchPoints && navigator.maxTouchPoints > 1);
+  return mobileRegex.test(ua) || isMacTouchTablet;
+}
+
 export async function printScreen() {
+  if (isMobileOrTablet()) {
+    toast('모바일/태블릿 환경에서는 직접 인쇄를 지원하지 않습니다. [이미지로 저장] 후 갤러리(사진 앱)에서 인쇄해 주세요.', true);
+    return;
+  }
+
   if (!state.seats.some(s => s.student)) {
     toast('먼저 학생 명단을 적용하고 자리를 배치해주세요.', true);
     return;
