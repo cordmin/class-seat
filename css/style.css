@@ -913,14 +913,14 @@
       height: 100% !important; 
       margin: 0 !important;
       padding: 0 !important;
-      overflow: hidden !important;
+      overflow: visible !important;
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
     }
 
     #temp-print-wrap {
-      position: fixed !important;
+      position: absolute !important;
       left: 50% !important;
       top: 50% !important;
       margin: 0 !important;
@@ -936,6 +936,8 @@
       break-inside: avoid !important;
       page-break-after: avoid !important;
       break-after: avoid !important;
+      transform: translate(-50%, -50%) scale(var(--print-scale, 1)) !important;
+      transform-origin: center center !important;
       --cell-w: 82px !important;
       --cell-h: 62px !important;
       --col-gap: 28px !important;

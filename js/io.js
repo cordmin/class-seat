@@ -484,10 +484,22 @@ export async function printScreen() {
   
   printWrap.style.transform = `translate(-50%, -50%) scale(${scale})`;
   printWrap.style.transformOrigin = 'center center';
+  printWrap.style.setProperty('--print-scale', scale.toString());
+
+  let isCleaned = false;
+  const safeCleanup = () => {
+    if (isCleaned) return;
+    isCleaned = true;
+    window.removeEventListener('afterprint', safeCleanup);
+    cleanup();
+  };
+
+  window.addEventListener('afterprint', safeCleanup, { once: true });
 
   setTimeout(() => {
     window.print();
-    cleanup();
+    // 모바일/태블릿 브라우저는 window.print()가 비동기이므로 렌더링 생성 후 safeCleanup 호출되도록 지연
+    setTimeout(safeCleanup, 2500);
   }, 300);
 }
 
