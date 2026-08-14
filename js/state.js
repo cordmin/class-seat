@@ -70,10 +70,19 @@ export const LAYOUTS = {
   group6:  { rows: [[0,0],[0,0],[0,0]],             cols: 2 }
 };
 
+function cleanId(val) {
+  if (val === undefined || val === null) return '';
+  let s = String(val).trim();
+  if (s.endsWith('.0')) {
+    s = s.slice(0, -2);
+  }
+  return s;
+}
+
 export function getArrangementDataForSave() {
   return JSON.stringify({
     version: 2,
-    students: state.students,
+    students: state.students.map(st => ({ ...st, id: cleanId(st.id) })),
     cfg,
     seats: state.seats.map(s => ({
       id: s.id,
@@ -83,8 +92,8 @@ export function getArrangementDataForSave() {
       orderIdx: s.orderIdx,
       colIdx: s.colIdx,
       rowIdx: s.rowIdx,
-      fixedFor: s.fixedFor,
-      studentId: s.student ? s.student.id : null
+      fixedFor: cleanId(s.fixedFor),
+      studentId: s.student ? cleanId(s.student.id) : null
     }))
   }, null, 2);
 }
@@ -107,7 +116,11 @@ export function loadAutoState() {
     const d = JSON.parse(dataStr);
     if (!d || !d.students || !d.seats) return false;
 
-    state.students = d.students || [];
+    state.students = (d.students || []).map(st => ({
+      ...st,
+      id: cleanId(st.id)
+    }));
+
     if (d.cfg) {
       Object.assign(cfg, d.cfg);
     }
@@ -116,7 +129,8 @@ export function loadAutoState() {
     }
 
     state.seats = d.seats.map(s => {
-      const studentObj = s.studentId ? state.students.find(st => st.id === s.studentId) || null : null;
+      const cleanStudentId = cleanId(s.studentId);
+      const studentObj = cleanStudentId ? state.students.find(st => cleanId(st.id) === cleanStudentId) || null : null;
       return {
         id: s.id,
         isGhost: !!s.isGhost,
@@ -125,11 +139,12 @@ export function loadAutoState() {
         orderIdx: s.orderIdx,
         colIdx: s.colIdx,
         rowIdx: s.rowIdx,
-        fixedFor: s.fixedFor || null,
+        fixedFor: cleanId(s.fixedFor) || null,
         student: studentObj
       };
     });
 
+    saveAutoState();
     return true;
   } catch (err) {
     console.error('Failed to load auto-saved state:', err);
