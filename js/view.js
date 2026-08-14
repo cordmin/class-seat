@@ -1,6 +1,7 @@
 import { state, cfg, LAYOUTS, saveAutoState } from './state.js';
 import { getLayoutRows, applyAlgo } from './layout.js';
 import { toast, customConfirm } from './ui.js';
+import { cleanId } from './io.js';
 
 export function renderSeats() {
   const container = document.getElementById('seats-container');
@@ -321,7 +322,7 @@ function onTouchMove(id, e) {
     const ghost = document.createElement('div');
     ghost.className = 'touch-drag-ghost';
     if (seat.student) {
-      ghost.innerHTML = `<span class="seat-id">${seat.student.id}</span><span class="seat-name">${seat.student.name}</span>`;
+      ghost.innerHTML = `<span class="seat-id">${cleanId(seat.student.id)}</span><span class="seat-name">${seat.student.name}</span>`;
       if (seat.student.gender === '남') ghost.classList.add('male');
       else if (seat.student.gender === '여') ghost.classList.add('female');
     } else {
@@ -395,7 +396,7 @@ function onTouchCancel(id, e) {
 
 function openContextMenu(x, y, seat) {
   const menu = document.getElementById('ctx-menu');
-  document.getElementById('ctx-head').textContent = seat.student ? `자리: ${seat.student.id} ${seat.student.name}` : '빈 자리';
+  document.getElementById('ctx-head').textContent = seat.student ? `자리: ${cleanId(seat.student.id)} ${seat.student.name}` : '빈 자리';
   const itemsEl = document.getElementById('ctx-items');
   itemsEl.innerHTML = '';
 
@@ -418,7 +419,7 @@ function openContextMenu(x, y, seat) {
   state.students.forEach(st => {
     const btn = document.createElement('div');
     btn.className = 'ctx-item';
-    btn.innerHTML = `<span style="background:#F18BA7;color:#fff;border-radius:4px;padding:1px 5px;font-size:10px;font-weight:800;min-width:20px;text-align:center;">${st.id}</span> ${st.name}`;
+    btn.innerHTML = `<span style="background:#F18BA7;color:#fff;border-radius:4px;padding:1px 5px;font-size:10px;font-weight:800;min-width:20px;text-align:center;">${cleanId(st.id)}</span> ${st.name}`;
     btn.onclick = () => {
       seat.fixedFor = st.id;
       seat.isLocked = false;

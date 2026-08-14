@@ -121,7 +121,17 @@ class Api:
             for row in ws.iter_rows(min_row=2, values_only=True):
                 if not row or (row[0] is None and row[1] is None):
                     continue
-                num = str(row[0]).strip() if row[0] is not None else ""
+                raw_num = row[0]
+                if raw_num is not None:
+                    if isinstance(raw_num, float) and raw_num.is_integer():
+                        num = str(int(raw_num))
+                    else:
+                        num = str(raw_num).strip()
+                        if num.endswith('.0'):
+                            num = num[:-2]
+                else:
+                    num = ""
+
                 name = str(row[1]).strip() if len(row) > 1 and row[1] is not None else ""
                 gender = str(row[2]).strip() if len(row) > 2 and row[2] is not None else ""
                 

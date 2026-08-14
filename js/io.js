@@ -70,8 +70,20 @@ export function addStudentRow() {
   body.appendChild(buildGridRow());
 }
 
+export function cleanId(val) {
+  if (val === undefined || val === null) return '';
+  let s = String(val).trim();
+  if (s.endsWith('.0')) {
+    s = s.slice(0, -2);
+  }
+  return s;
+}
+
 function applyLoadedStudents(students) {
-  state.students = students;
+  state.students = (students || []).map(st => ({
+    ...st,
+    id: cleanId(st.id)
+  }));
   updateStudentListPreview();
   const seatInput = document.getElementById('seat-count');
   if (seatInput) {
@@ -147,7 +159,7 @@ export async function loadStudentExcel() {
         for (let i = 1; i < jsonRows.length; i++) {
           const row = jsonRows[i];
           if (!row || row.length === 0) continue;
-          const num = row[0] !== undefined && row[0] !== null ? String(row[0]).trim() : '';
+          const num = cleanId(row[0]);
           const name = row[1] !== undefined && row[1] !== null ? String(row[1]).trim() : '';
           let gender = row[2] !== undefined && row[2] !== null ? String(row[2]).trim() : '';
 
@@ -616,7 +628,10 @@ export function processLoadedData(jsonStr) {
   try {
     const d = JSON.parse(jsonStr);
     if (d.students) {
-      state.students = d.students;
+      state.students = d.students.map(st => ({
+        ...st,
+        id: cleanId(st.id)
+      }));
       initGrid(Math.max(INIT_ROWS, state.students.length + 3));
       const rows = document.querySelectorAll('#student-grid-body .student-row');
       state.students.forEach((st, i) => {
