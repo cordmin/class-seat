@@ -416,11 +416,11 @@ export async function saveAsImage() {
   if (!layout) return;
 
   const { printWrap, cleanup } = layout;
-  printWrap.style.position = 'fixed';
+  printWrap.style.position = 'absolute';
   printWrap.style.left = '0';
   printWrap.style.top = '0';
-  printWrap.style.zIndex = '-9999';
-  printWrap.style.opacity = '0.001';
+  printWrap.style.zIndex = '-99999';
+  printWrap.style.opacity = '1';
   printWrap.style.pointerEvents = 'none';
   printWrap.style.transform = 'none';
   document.body.appendChild(printWrap);
@@ -437,12 +437,6 @@ export async function saveAsImage() {
       scale: 2,
       useCORS: true,
       logging: false,
-      width: printWrap.offsetWidth,
-      height: printWrap.offsetHeight,
-      windowWidth: printWrap.offsetWidth,
-      windowHeight: printWrap.offsetHeight,
-      x: 0,
-      y: 0,
       scrollX: 0,
       scrollY: 0,
     });
@@ -487,11 +481,11 @@ export async function printScreen() {
   if (!layout) return;
 
   const { printWrap, cleanup } = layout;
-  printWrap.style.position = 'fixed';
+  printWrap.style.position = 'absolute';
   printWrap.style.left = '0';
   printWrap.style.top = '0';
-  printWrap.style.zIndex = '-9999';
-  printWrap.style.opacity = '0.001';
+  printWrap.style.zIndex = '-99999';
+  printWrap.style.opacity = '1';
   printWrap.style.pointerEvents = 'none';
   printWrap.style.transform = 'none';
   document.body.appendChild(printWrap);
@@ -502,12 +496,6 @@ export async function printScreen() {
       scale: 2,
       useCORS: true,
       logging: false,
-      width: printWrap.offsetWidth,
-      height: printWrap.offsetHeight,
-      windowWidth: printWrap.offsetWidth,
-      windowHeight: printWrap.offsetHeight,
-      x: 0,
-      y: 0,
       scrollX: 0,
       scrollY: 0,
     });
