@@ -901,7 +901,7 @@
   .sort-row { display: flex; gap: 4px; margin-top: 5px; }
   .sort-row .inp { font-size: 11px; padding: 5px 4px; }
 
-  /* ── 인쇄 전용 스타일 (A4 가로 1페이지 완벽 중앙 정렬) ── */
+  /* ── 인쇄 전용 스타일 (A4 가로 1페이지 상하 꽉 찬 레이아웃) ── */
   @media print {
     body > *:not(#temp-print-wrap) {
       display: none !important;
@@ -922,13 +922,13 @@
       left: auto !important;
       top: auto !important;
       margin: 0 auto !important;
-      padding: 10px !important;
+      padding: 4px 8px !important;
       background: #ffffff !important;
       display: flex !important;
-      flex-direction: row !important;
-      gap: 20px !important;
-      align-items: flex-start !important;
-      justify-content: center !important;
+      flex-direction: column !important;
+      gap: 8px !important;
+      align-items: center !important;
+      justify-content: space-between !important;
       overflow: visible !important;
       page-break-inside: avoid !important;
       break-inside: avoid !important;
@@ -936,21 +936,21 @@
       break-after: avoid !important;
       transform: none !important;
       width: 100% !important;
-      max-width: 1000px !important;
+      max-width: 1060px !important;
       box-sizing: border-box !important;
-      --cell-w: 80px !important;
-      --cell-h: 58px !important;
-      --col-gap: 24px !important;
-      --row-gap: 8px !important;
-      --name-size: 12px !important;
-      --id-size: 10px !important;
+      --cell-w: 106px !important;
+      --cell-h: 70px !important;
+      --col-gap: 30px !important;
+      --row-gap: 10px !important;
+      --name-size: 15px !important;
+      --id-size: 11px !important;
     }
 
     #seats-wrap-print {
       background: #ffffff !important;
-      border: 2px solid #000000 !important;
-      border-radius: 10px !important;
-      padding: 16px !important;
+      border: 2.5px solid #000000 !important;
+      border-radius: 12px !important;
+      padding: 16px 20px !important;
       box-shadow: none !important;
       display: inline-block !important;
     }
@@ -965,7 +965,7 @@
 
     @page {
       size: landscape;
-      margin: 10mm; 
+      margin: 4mm; 
     }
   }
 

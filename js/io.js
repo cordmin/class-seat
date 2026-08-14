@@ -325,66 +325,85 @@ function buildPrintContainer() {
 
   const printWrap = document.createElement('div');
   printWrap.id = 'temp-print-wrap';
-  printWrap.style.cssText = 'position:fixed; left:50%; top:50%; width:max-content; max-width:none; background:#ffffff; padding:20px; box-sizing:border-box; display:flex; flex-direction:row; gap:20px; align-items:center; justify-content:center; transform:translate(-50%,-50%); transform-origin:center center; z-index:99999; border-radius:12px; --cell-w:80px; --cell-h:60px; --col-gap:28px; --row-gap:10px; --name-size:13px; --id-size:10px;';
+  printWrap.style.cssText = 'position:fixed; left:50%; top:50%; width:max-content; max-width:none; background:#ffffff; padding:15px; box-sizing:border-box; display:flex; flex-direction:column; gap:12px; align-items:center; justify-content:center; transform:translate(-50%,-50%); transform-origin:center center; z-index:99999; border-radius:12px; --cell-w:106px; --cell-h:70px; --col-gap:30px; --row-gap:10px; --name-size:15px; --id-size:11px;';
 
-  // 1. 좌측 학생 명단 표 생성 (번호 | 이름 | 성별)
-  const listDiv = document.createElement('div');
-  listDiv.style.cssText = 'width:210px; flex-shrink:0; box-sizing:border-box;';
-  
-  let tableHtml = `
-    <table style="width:100%; border-collapse:collapse; font-family:'Noto Sans KR', 'Malgun Gothic', sans-serif; font-size:11px; border:2px solid #000000;">
-      <thead>
-        <tr style="background:#fce7f3; color:#000000; font-size:12px; font-weight:900; -webkit-print-color-adjust:exact; print-color-adjust:exact;">
-          <th style="border:1px solid #000000; padding:4px 2px; width:45px; text-align:center;">번호</th>
-          <th style="border:1px solid #000000; padding:4px 2px; text-align:center;">이 름</th>
-          <th style="border:1px solid #000000; padding:4px 2px; width:45px; text-align:center;">성별</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
-
-  const sortedStudents = [...state.students].sort((a, b) => 
-    String(a.id || '').localeCompare(String(b.id || ''), 'ko', { numeric: true })
-  );
-
-  sortedStudents.forEach(st => {
-    tableHtml += `
-      <tr style="background:#ffffff;">
-        <td style="border:1px solid #000000; padding:3px 2px; text-align:center; font-weight:700; color:#000000;">${st.id || ''}</td>
-        <td style="border:1px solid #000000; padding:3px 4px; text-align:center; font-weight:700; color:#000000;">${st.name || ''}</td>
-        <td style="border:1px solid #000000; padding:3px 2px; text-align:center; color:#000000;">${st.gender || ''}</td>
-      </tr>
-    `;
-  });
-  tableHtml += '</tbody></table>';
-  listDiv.innerHTML = tableHtml;
-
-  // 2. 우측 분단 배치 영역 (원본 seatsWrap 복제본 사용하여 메인 DOM 보존)
+  // 1. 상단 분단 배치 영역 (칠판 + 책상 배열, 원본 복제)
   const isTeacher = state.teacherView;
-  const rightWrap = document.createElement('div');
-  rightWrap.style.cssText = 'flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; box-sizing:border-box; gap:12px;';
+  const topWrap = document.createElement('div');
+  topWrap.style.cssText = 'width:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; box-sizing:border-box; gap:10px; flex-shrink:0; order:1;';
 
   const bbEl = document.createElement('div');
-  bbEl.style.cssText = 'width:70%; max-width:380px; padding:12px 5px; background:#2e4a38; color:#ffffff; font-weight:900; text-align:center; border-radius:6px; font-size:14px; letter-spacing:4px; -webkit-print-color-adjust:exact; print-color-adjust:exact;';
+  bbEl.style.cssText = 'width:60%; max-width:460px; padding:10px 5px; background:#2e4a38; color:#ffffff; font-weight:900; text-align:center; border-radius:6px; font-size:15px; letter-spacing:4px; -webkit-print-color-adjust:exact; print-color-adjust:exact;';
   bbEl.textContent = isTeacher ? '칠 판 (교사 시점)' : '칠 판';
 
   const seatsWrapClone = seatsWrap.cloneNode(true);
   seatsWrapClone.id = 'seats-wrap-print';
-  seatsWrapClone.style.order = isTeacher ? '1' : '2';
-
-  printWrap.appendChild(listDiv);
 
   if (isTeacher) {
+    seatsWrapClone.style.order = '1';
     bbEl.style.order = '2';
-    rightWrap.appendChild(seatsWrapClone);
-    rightWrap.appendChild(bbEl);
+    topWrap.appendChild(seatsWrapClone);
+    topWrap.appendChild(bbEl);
   } else {
     bbEl.style.order = '1';
-    rightWrap.appendChild(bbEl);
-    rightWrap.appendChild(seatsWrapClone);
+    seatsWrapClone.style.order = '2';
+    topWrap.appendChild(bbEl);
+    topWrap.appendChild(seatsWrapClone);
   }
   
-  printWrap.appendChild(rightWrap);
+  printWrap.appendChild(topWrap);
+
+  // 2. 하단 학생 명단 표 생성 (가로 수직 배치 및 다중 컬럼 적용으로 높이 최소화)
+  const sortedStudents = [...state.students].sort((a, b) => 
+    String(a.id || '').localeCompare(String(b.id || ''), 'ko', { numeric: true })
+  );
+
+  const totalStudents = sortedStudents.length;
+  let numColumns = 3;
+  if (totalStudents <= 12) numColumns = 2;
+  else if (totalStudents > 36) numColumns = 4;
+
+  const chunkSize = Math.ceil(totalStudents / numColumns);
+  const studentChunks = [];
+  for (let i = 0; i < numColumns; i++) {
+    studentChunks.push(sortedStudents.slice(i * chunkSize, (i + 1) * chunkSize));
+  }
+
+  const listDiv = document.createElement('div');
+  listDiv.style.cssText = 'width:100%; max-width:980px; box-sizing:border-box; display:flex; flex-direction:row; gap:12px; justify-content:center; align-items:flex-start; order:2; flex-shrink:0;';
+
+  studentChunks.forEach(chunk => {
+    if (chunk.length === 0) return;
+    const subTableDiv = document.createElement('div');
+    subTableDiv.style.cssText = 'flex:1; max-width:240px; box-sizing:border-box;';
+
+    let tableHtml = `
+      <table style="width:100%; border-collapse:collapse; font-family:'Noto Sans KR', 'Malgun Gothic', sans-serif; font-size:11px; border:2px solid #000000;">
+        <thead>
+          <tr style="background:#fce7f3; color:#000000; font-size:11px; font-weight:900; -webkit-print-color-adjust:exact; print-color-adjust:exact;">
+            <th style="border:1px solid #000000; padding:3px 2px; width:40px; text-align:center;">번호</th>
+            <th style="border:1px solid #000000; padding:3px 2px; text-align:center;">이 름</th>
+            <th style="border:1px solid #000000; padding:3px 2px; width:40px; text-align:center;">성별</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    chunk.forEach(st => {
+      tableHtml += `
+        <tr style="background:#ffffff;">
+          <td style="border:1px solid #000000; padding:2px 2px; text-align:center; font-weight:700; color:#000000;">${st.id || ''}</td>
+          <td style="border:1px solid #000000; padding:2px 4px; text-align:center; font-weight:700; color:#000000;">${st.name || ''}</td>
+          <td style="border:1px solid #000000; padding:2px 2px; text-align:center; color:#000000;">${st.gender || ''}</td>
+        </tr>
+      `;
+    });
+    tableHtml += '</tbody></table>';
+    subTableDiv.innerHTML = tableHtml;
+    listDiv.appendChild(subTableDiv);
+  });
+
+  printWrap.appendChild(listDiv);
 
   const cleanup = () => {
     printWrap.remove();
@@ -465,9 +484,9 @@ export async function printScreen() {
   const { printWrap, cleanup } = layout;
   document.body.appendChild(printWrap);
 
-  // A4 가로 1페이지 화면 기준 스케일 계산 (PC 미리보기 용도)
-  const targetW = 880;
-  const targetH = 600;
+  // A4 가로 1페이지 상하 꽉 찬 레이아웃 스케일 계산
+  const targetW = 1000;
+  const targetH = 680;
   const w = printWrap.scrollWidth || 1020;
   const h = printWrap.scrollHeight || 700;
   const scale = Math.min(targetW / w, targetH / h, 1);
