@@ -416,9 +416,13 @@ export async function saveAsImage() {
   if (!layout) return;
 
   const { printWrap, cleanup } = layout;
+  printWrap.style.position = 'fixed';
+  printWrap.style.left = '0';
+  printWrap.style.top = '0';
+  printWrap.style.zIndex = '-9999';
+  printWrap.style.opacity = '0.001';
+  printWrap.style.pointerEvents = 'none';
   printWrap.style.transform = 'none';
-  printWrap.style.left = '-9999px';
-  printWrap.style.top = '-9999px';
   document.body.appendChild(printWrap);
 
   const today = new Date();
@@ -433,6 +437,14 @@ export async function saveAsImage() {
       scale: 2,
       useCORS: true,
       logging: false,
+      width: printWrap.offsetWidth,
+      height: printWrap.offsetHeight,
+      windowWidth: printWrap.offsetWidth,
+      windowHeight: printWrap.offsetHeight,
+      x: 0,
+      y: 0,
+      scrollX: 0,
+      scrollY: 0,
     });
 
     const dataUrl = canvas.toDataURL('image/png');
