@@ -903,7 +903,14 @@
 
   /* ── 인쇄 전용 스타일 (html2canvas 캔버스 이미지 방식: A4 가로 1페이지 완벽 맞춤) ── */
   #print-img-wrap {
-    display: none;
+    position: fixed;
+    left: -9999px;
+    top: -9999px;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: -1;
   }
 
   @media print {
@@ -924,6 +931,7 @@
     }
 
     #print-img-wrap {
+      position: static !important;
       display: flex !important;
       width: 100% !important;
       height: 100% !important;
