@@ -656,6 +656,15 @@ export function toggleTeacherView() {
   renderSeats();
 }
 
+export function toggleShowRoster() {
+  const checkbox = document.getElementById('show-roster-toggle');
+  if (checkbox) {
+    state.showRoster = checkbox.checked;
+  } else {
+    state.showRoster = !state.showRoster;
+  }
+}
+
 export function updateBadge() {
   const badge = document.getElementById('avail-badge');
   if (badge) {

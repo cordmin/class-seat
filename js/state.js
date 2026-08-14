@@ -8,6 +8,7 @@ export const state = {
   ctxTarget: null,
   confirmCallback: null,
   teacherView: false,
+  showRoster: true,
   isArrangementCancelled: false,
   prevStateJson: null
 };

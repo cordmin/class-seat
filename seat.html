@@ -134,7 +134,18 @@
     </div>
 
     <div class="card">
-      <div class="card-head">자리 배치결과</div>
+      <div class="card-head">
+        <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+          <span>자리 배치결과</span>
+          <div style="display:flex; align-items:center; gap:5px;">
+            <label class="switch">
+              <input type="checkbox" id="show-roster-toggle" checked onchange="toggleShowRoster()">
+              <span class="slider"></span>
+            </label>
+            <span class="toggle-label">명렬표</span>
+          </div>
+        </div>
+      </div>
       <div class="card-body">
         <div style="display:flex; gap:5px; margin-top:4px;">
           <button class="exec-btn-sm outline" style="flex:1; display:inline-flex; align-items:center; justify-content:center; gap:5px;" onclick="printScreen()">

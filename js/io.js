@@ -323,43 +323,54 @@ function buildPrintContainer() {
   const seatsWrap = document.getElementById('seats-wrap');
   if (!seatsWrap) return null;
 
+  const showRoster = state.showRoster !== false;
+
   const printWrap = document.createElement('div');
   printWrap.id = 'temp-print-wrap';
-  printWrap.style.cssText = 'position:fixed; left:50%; top:50%; width:max-content; max-width:none; background:#ffffff; padding:24px; box-sizing:border-box; display:flex; flex-direction:row; gap:24px; align-items:center; justify-content:center; transform:translate(-50%,-50%); transform-origin:center center; z-index:99999; border-radius:12px; --cell-w:108px; --cell-h:70px; --col-gap:32px; --row-gap:12px; --name-size:15px; --id-size:11px;';
 
-  // 1. 좌측 학생 명단 표 생성 (이름 4글자 맞춤 폭 145px 축소)
-  const listDiv = document.createElement('div');
-  listDiv.style.cssText = 'width:145px; flex-shrink:0; box-sizing:border-box;';
-  
-  let tableHtml = `
-    <table style="width:100%; border-collapse:collapse; font-family:'Noto Sans KR', 'Malgun Gothic', sans-serif; font-size:11px; border:2px solid #000000; table-layout:fixed;">
-      <thead>
-        <tr style="background:#fce7f3; color:#000000; font-size:11.5px; font-weight:900; -webkit-print-color-adjust:exact; print-color-adjust:exact;">
-          <th style="border:1px solid #000000; padding:4px 1px; width:34px; text-align:center;">번호</th>
-          <th style="border:1px solid #000000; padding:4px 2px; text-align:center;">이 름</th>
-          <th style="border:1px solid #000000; padding:4px 1px; width:34px; text-align:center;">성별</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
+  if (showRoster) {
+    printWrap.style.cssText = 'position:fixed; left:50%; top:50%; width:max-content; max-width:none; background:#ffffff; padding:24px; box-sizing:border-box; display:flex; flex-direction:row; gap:24px; align-items:center; justify-content:center; transform:translate(-50%,-50%); transform-origin:center center; z-index:99999; border-radius:12px; --cell-w:108px; --cell-h:70px; --col-gap:32px; --row-gap:12px; --name-size:15px; --id-size:11px;';
+  } else {
+    // 명렬표 미포함 시: 칠판 및 분단배치만 단독 렌더링 (셀 크기 극대화)
+    printWrap.style.cssText = 'position:fixed; left:50%; top:50%; width:max-content; max-width:none; background:#ffffff; padding:28px; box-sizing:border-box; display:flex; flex-direction:row; gap:0px; align-items:center; justify-content:center; transform:translate(-50%,-50%); transform-origin:center center; z-index:99999; border-radius:12px; --cell-w:125px; --cell-h:80px; --col-gap:38px; --row-gap:14px; --name-size:16.5px; --id-size:12px;';
+  }
 
-  const sortedStudents = [...state.students].sort((a, b) => 
-    String(a.id || '').localeCompare(String(b.id || ''), 'ko', { numeric: true })
-  );
-
-  sortedStudents.forEach(st => {
-    tableHtml += `
-      <tr style="background:#ffffff;">
-        <td style="border:1px solid #000000; padding:3px 1px; text-align:center; font-weight:700; color:#000000;">${st.id || ''}</td>
-        <td style="border:1px solid #000000; padding:3px 2px; text-align:center; font-weight:700; color:#000000; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${st.name || ''}</td>
-        <td style="border:1px solid #000000; padding:3px 1px; text-align:center; color:#000000;">${st.gender || ''}</td>
-      </tr>
+  // 1. 좌측 학생 명단 표 생성 (토글 활성화 시에만 포함)
+  if (showRoster) {
+    const listDiv = document.createElement('div');
+    listDiv.style.cssText = 'width:145px; flex-shrink:0; box-sizing:border-box;';
+    
+    let tableHtml = `
+      <table style="width:100%; border-collapse:collapse; font-family:'Noto Sans KR', 'Malgun Gothic', sans-serif; font-size:11px; border:2px solid #000000; table-layout:fixed;">
+        <thead>
+          <tr style="background:#fce7f3; color:#000000; font-size:11.5px; font-weight:900; -webkit-print-color-adjust:exact; print-color-adjust:exact;">
+            <th style="border:1px solid #000000; padding:4px 1px; width:34px; text-align:center;">번호</th>
+            <th style="border:1px solid #000000; padding:4px 2px; text-align:center;">이 름</th>
+            <th style="border:1px solid #000000; padding:4px 1px; width:34px; text-align:center;">성별</th>
+          </tr>
+        </thead>
+        <tbody>
     `;
-  });
-  tableHtml += '</tbody></table>';
-  listDiv.innerHTML = tableHtml;
 
-  // 2. 우측 칠판 및 분단 배치 영역 (대형화 확대 적용)
+    const sortedStudents = [...state.students].sort((a, b) => 
+      String(a.id || '').localeCompare(String(b.id || ''), 'ko', { numeric: true })
+    );
+
+    sortedStudents.forEach(st => {
+      tableHtml += `
+        <tr style="background:#ffffff;">
+          <td style="border:1px solid #000000; padding:3px 1px; text-align:center; font-weight:700; color:#000000;">${st.id || ''}</td>
+          <td style="border:1px solid #000000; padding:3px 2px; text-align:center; font-weight:700; color:#000000; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${st.name || ''}</td>
+          <td style="border:1px solid #000000; padding:3px 1px; text-align:center; color:#000000;">${st.gender || ''}</td>
+        </tr>
+      `;
+    });
+    tableHtml += '</tbody></table>';
+    listDiv.innerHTML = tableHtml;
+    printWrap.appendChild(listDiv);
+  }
+
+  // 2. 우측 칠판 및 분단 배치 영역
   const isTeacher = state.teacherView;
   const rightWrap = document.createElement('div');
   rightWrap.style.cssText = 'flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; box-sizing:border-box; gap:14px;';
@@ -370,8 +381,6 @@ function buildPrintContainer() {
 
   const seatsWrapClone = seatsWrap.cloneNode(true);
   seatsWrapClone.id = 'seats-wrap-print';
-
-  printWrap.appendChild(listDiv);
 
   if (isTeacher) {
     seatsWrapClone.style.order = '1';
