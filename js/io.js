@@ -476,8 +476,11 @@ export async function printScreen() {
 
   const { printWrap, cleanup } = layout;
   printWrap.style.position = 'fixed';
-  printWrap.style.left = '-9999px';
-  printWrap.style.top = '-9999px';
+  printWrap.style.left = '0';
+  printWrap.style.top = '0';
+  printWrap.style.zIndex = '-9999';
+  printWrap.style.opacity = '0.001';
+  printWrap.style.pointerEvents = 'none';
   printWrap.style.transform = 'none';
   document.body.appendChild(printWrap);
 
@@ -487,9 +490,16 @@ export async function printScreen() {
       scale: 2,
       useCORS: true,
       logging: false,
+      width: printWrap.offsetWidth,
+      height: printWrap.offsetHeight,
+      windowWidth: printWrap.offsetWidth,
+      windowHeight: printWrap.offsetHeight,
+      x: 0,
+      y: 0,
+      scrollX: 0,
+      scrollY: 0,
     });
 
-    // Blob URL 생성 (모바일 WebKit Base64 디코딩 누락 방지)
     const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
     const blobUrl = URL.createObjectURL(blob);
     cleanup();
@@ -503,7 +513,6 @@ export async function printScreen() {
     imgWrap.appendChild(img);
     document.body.appendChild(imgWrap);
 
-    // 모바일 브라우저 이미지 비트맵 디코딩 대기
     if (!img.complete) {
       await new Promise(resolve => {
         img.onload = resolve;
@@ -513,7 +522,7 @@ export async function printScreen() {
     if (img.decode) {
       try { await img.decode(); } catch (e) {}
     }
-    await new Promise(r => setTimeout(r, 200));
+    await new Promise(r => setTimeout(r, 250));
 
     let isCleaned = false;
     const safeCleanup = () => {

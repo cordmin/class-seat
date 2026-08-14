@@ -904,13 +904,28 @@
   /* ── 인쇄 전용 스타일 (html2canvas 캔버스 이미지 방식: A4 가로 1페이지 완벽 맞춤) ── */
   #print-img-wrap {
     position: fixed;
-    left: -9999px;
-    top: -9999px;
+    left: 0;
+    top: 0;
     width: 100vw;
     height: 100vh;
-    overflow: hidden;
-    pointer-events: none;
-    z-index: -1;
+    z-index: 999999;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 20px;
+  }
+
+  #print-img-wrap img {
+    max-width: 95vw;
+    max-height: 95vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    background: #ffffff;
   }
 
   @media print {
@@ -932,15 +947,17 @@
 
     #print-img-wrap {
       position: static !important;
-      display: flex !important;
+      left: auto !important;
+      top: auto !important;
       width: 100% !important;
       height: 100% !important;
+      background: #ffffff !important;
+      display: flex !important;
       align-items: center !important;
       justify-content: center !important;
       page-break-inside: avoid !important;
       break-inside: avoid !important;
-      page-break-after: avoid !important;
-      break-after: avoid !important;
+      padding: 0 !important;
     }
 
     #print-img-wrap img {
@@ -951,6 +968,8 @@
       object-fit: contain !important;
       display: block !important;
       margin: auto !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
     }
 
     * {
