@@ -1,6 +1,6 @@
 import { state, cfg, INIT_ROWS, getArrangementDataForSave, saveAutoState, loadAutoState } from './state.js';
 import { initSeats, updateSelectLogic, onSeatCountChange, onColCountChange, onLayoutChange, onAlgoChange } from './layout.js';
-import { renderSeats, updateBadge, toggleTeacherView, toggleShowRoster, executeArrangement, resetArrangement } from './view.js';
+import { renderSeats, updateBadge, toggleTeacherView, toggleShowRoster, executeArrangement, resetArrangement, preloadCountdownImages } from './view.js';
 import { downloadTemplate, loadStudentExcel, exportToExcel, saveAsImage, printScreen, saveFile, loadFile, onLoadFile, addStudentRow, initGrid, processLoadedData, resetStudentList } from './io.js';
 import { toast, showConfirm, confirmOk, confirmCancel, updateStudentListPreview, openStudentModal, closeStudentModal, toggleSaveMenu, hideSaveMenu } from './ui.js';
 
@@ -83,7 +83,16 @@ if (loaded) {
 
 document.documentElement.style.setProperty('--seat-font', cfg.fontFamily);
 
+// 카운트다운 옵션 변경 시 이미지 사전 로드 보장
+const countdownOptEl = document.getElementById('countdown-opt');
+if (countdownOptEl) {
+  countdownOptEl.addEventListener('change', () => {
+    if (countdownOptEl.checked) preloadCountdownImages();
+  });
+}
+
 // 창 닫기/새로그침 전 자동 저장
 window.addEventListener('beforeunload', () => {
   saveAutoState();
 });
+

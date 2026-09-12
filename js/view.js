@@ -3,6 +3,45 @@ import { getLayoutRows, applyAlgo } from './layout.js';
 import { toast, customConfirm } from './ui.js';
 import { cleanId } from './io.js';
 
+// 카운트다운 루피 이미지 WebP 캐시 및 프리로드 관리
+const COUNTDOWN_IMAGES = {};
+let countdownPreloadPromise = null;
+
+export function preloadCountdownImages() {
+  if (countdownPreloadPromise) return countdownPreloadPromise;
+
+  const counts = [5, 4, 3, 2, 1];
+  const promises = counts.map(n => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        COUNTDOWN_IMAGES[n] = img.src;
+        resolve(img.src);
+      };
+      img.onerror = () => {
+        // WebP 미지원 또는 로드 실패 시 PNG 폴백
+        const fallback = new Image();
+        fallback.onload = () => {
+          COUNTDOWN_IMAGES[n] = fallback.src;
+          resolve(fallback.src);
+        };
+        fallback.onerror = () => {
+          COUNTDOWN_IMAGES[n] = `loopy/${n}.png`;
+          resolve(COUNTDOWN_IMAGES[n]);
+        };
+        fallback.src = `loopy/${n}.png`;
+      };
+      img.src = `loopy/${n}.webp`;
+    });
+  });
+
+  countdownPreloadPromise = Promise.all(promises);
+  return countdownPreloadPromise;
+}
+
+// 스크립트 로드 즉시 백그라운드 프리로드 시작
+preloadCountdownImages();
+
 export function renderSeats() {
   const container = document.getElementById('seats-container');
   if (!container) return;
@@ -574,10 +613,18 @@ export function playMarimbaFanfare() {
   } catch (e) {}
 }
 
-export function startArrangeCountdown(prevState) {
+export async function startArrangeCountdown(prevState) {
   state.isArrangementCancelled = false;
   state.prevStateJson = prevState;
   cleanupCountdownEvents();
+
+  // 이미지가 아직 로딩 중이라면 로드 완료를 보장한 뒤 카운트다운 시작
+  if (!COUNTDOWN_IMAGES[5]) {
+    setBubbleText('<span style="font-size:14px; font-weight:700;">자리 배치 준비 중... ✨</span>', true);
+    await preloadCountdownImages();
+    if (state.isArrangementCancelled) return;
+  }
+
   let n = 5;
 
   const overlay = document.getElementById('countdown-overlay');
@@ -592,7 +639,7 @@ export function startArrangeCountdown(prevState) {
       void charImg.offsetWidth;
       void numText.offsetWidth;
 
-      charImg.src = `loopy/${count}.png`;
+      charImg.src = COUNTDOWN_IMAGES[count] || `loopy/${count}.webp`;
       numText.textContent = count;
 
       charImg.style.animation = 'countdownPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
